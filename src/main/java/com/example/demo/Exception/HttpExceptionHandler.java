@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class HttpExceptionHandler {
+
     @ExceptionHandler(NoNecessayException.class)
     public ResponseEntity<?> handleNoNecessaryException(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

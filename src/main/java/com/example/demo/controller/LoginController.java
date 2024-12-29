@@ -16,17 +16,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Controller
 public class LoginController extends MyController{
     @GetMapping("/Login")
-    public String getLogin() {
+    public String get() {
         return "/LoginPage/LoginPage.html";
     }
 
     // do login and return Http Status, token
     @PostMapping("/Login")
-    public ResponseEntity<?> login(@RequestBody User user){
+    public ResponseEntity<?> postLogin(@RequestBody User user) throws NotExistMethodName, NoNecessayException {
         //check input parameter
         checkInputParameter(new String[]{"id", "passwd"}, user);
 
-        System.out.println(user.toString());
         return ResponseEntity.status(HttpStatus.OK).body("login success");
     }
 }

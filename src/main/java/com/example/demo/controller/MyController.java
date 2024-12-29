@@ -5,6 +5,7 @@ import com.example.demo.Exception.NotExistMethodName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class MyController {
@@ -12,7 +13,7 @@ public class MyController {
 
     // necessarys[] 들이 실제 존재하는 함수들인지 확인 => 확인하지 않음 만약 에러 발생시 그냥 보이게
     // 해당 함수들 구해서 실행 결과값이 null이 존재하면 httpException 인자 없음
-    public void checkInputParameter(String necessarys[], Object param) throws NotExistMethodName,NoNecessayException {
+    public void checkInputParameter(String necessarys[], Object param) throws NotExistMethodName, NoNecessayException {
         String methodName = "not initialized";
         try {
             for (String necess : necessarys) {
@@ -20,14 +21,12 @@ public class MyController {
                 Method method = param.getClass().getMethod(methodName);
 
                 Object result = method.invoke(param);
-                System.out.println(result);
-                if(result == null) 
+                if(result == null) {
                     throw new NoNecessayException(necess);
+                }
             }
-        } catch (Exception e) {
-            //throw new NotExistMethodName(methodName);
-            System.out.println(methodName);
-            e.printStackTrace();
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new NotExistMethodName(methodName);
         }
     }
 }
