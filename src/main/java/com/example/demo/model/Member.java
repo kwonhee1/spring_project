@@ -1,6 +1,6 @@
 package com.example.demo.model;
 
-public class User {
+public class Member {
     private String id;      // pk auto_increment
     private String passwd;  // not null
     private String name;
@@ -12,7 +12,7 @@ public class User {
         return true;
     }
 
-    public User(){}
+    public Member(){}
 
     public String getName() {
         return name;

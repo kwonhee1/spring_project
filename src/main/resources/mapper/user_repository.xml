@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.demo.repository.UserRepository">
-    <insert id="addUser">
-        INSERT INTO user(email, passwd)
-        VALUES (#{user.email}, #{user.passwd});
+<mapper namespace="com.example.demo.repository.MemberRepository">
+    <insert id="addMember">
+        INSERT INTO member(email, passwd)
+        VALUES (#{member.email}, #{member.passwd});
     </insert>
 </mapper>

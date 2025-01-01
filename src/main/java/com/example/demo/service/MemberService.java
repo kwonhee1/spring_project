@@ -1,20 +1,20 @@
 package com.example.demo.service;
 
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.model.Member;
+import com.example.demo.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+public class MemberService {
     @Autowired
-    private UserRepository userRepository;
+    private MemberRepository memberRepository;
 
-    public void addUser(){
-        User user = new User();
+    public void addMmber(){
+        Member user = new Member();
         user.setEmail("test@gmail.com");
         user.setName("test");
         user.setPasswd("passwd");
-        userRepository.addUser(user);
+        memberRepository.addMember(user);
     }
 }
