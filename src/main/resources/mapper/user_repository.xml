@@ -4,7 +4,7 @@
 
 <mapper namespace="com.example.demo.repository.UserRepository">
     <insert id="addUser">
-        INSERT INTO member(email, passwd)
+        INSERT INTO user(email, passwd)
         VALUES (#{user.email}, #{user.passwd});
     </insert>
 </mapper>
