@@ -17,8 +17,6 @@ public class MainController {
     public String get(Model model) throws SQLException {
         model.addAttribute("message", "Hello World");
 
-        userService.addMmber();
-
         return "/MainPage/MainPage.html";
     }
 

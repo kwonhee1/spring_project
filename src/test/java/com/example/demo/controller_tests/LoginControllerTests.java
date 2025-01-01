@@ -1,4 +1,4 @@
-package com.example.demo.controllerTests;
+package com.example.demo.controller_tests;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

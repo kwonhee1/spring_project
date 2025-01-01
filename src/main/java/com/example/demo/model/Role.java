@@ -8,4 +8,8 @@ public enum Role {
     Role(String role){
         this.role = role;
     }
+
+    public boolean isEmpty(){
+        return this.role.isEmpty();
+    }
 }

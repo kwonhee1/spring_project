@@ -2,15 +2,11 @@ package com.example.demo.model;
 
 public class Member {
     private String id;      // pk auto_increment
+    private String email;   // varchar(35)
     private String passwd;  // not null
     private String name;
-    private String email;   // varchar(35)
 
     private Role role;      // check role in("user", "admin") default "user"
-
-    public Boolean validate(){
-        return true;
-    }
 
     public Member(){}
 

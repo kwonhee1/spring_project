@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+
+  <script>
+    async function submitForm() {
+      const id = document.querySelector('input[name="id"]').value;
+      const passwd = document.querySelector('input[name="passwd"]').value;
+      const other = "other";
+
+      try {
+        const response = await fetch('/Register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id, passwd }),
+        });
+
+        if (response.ok) {
+          const result = await response;
+          console.log('Login Successful:', result);
+        } else {
+          console.error('Login Failed:', response.status);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  </script>
+</head>
+<body>
+id : <input type="text" name="id"/>
+passwd : <input type="text" name="passwd"/>
+<button onclick="submitForm()">제출</button>
+</body>
+</html>
