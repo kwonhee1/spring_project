@@ -1,0 +1,6 @@
+spring boot
+	spring security 
+		login form, session 사용 안함 (자체 token 발급)
+		참고 자료 : https://ksh-coding.tistory.com/70
+
+	aop

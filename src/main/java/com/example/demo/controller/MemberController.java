@@ -5,25 +5,22 @@ import com.example.demo.exception.reflection.NotExistMethodName;
 import com.example.demo.model.Member;
 import com.example.demo.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
 @Controller
-public class MemberController extends MyController{
-
-    private final ObjectMapper objectMapper;
-
-    public MemberController(ObjectMapper objectMapper) {
-        super();
-        this.objectMapper = objectMapper;
-    }
+public class MemberController {
+    @Autowired
+    private MemberService service;
 
     // Login  : uri : Login, method : get, post
     @GetMapping("/Login")
@@ -35,27 +32,34 @@ public class MemberController extends MyController{
     @PostMapping("/Login")
     public ResponseEntity<?> postLogin(@RequestBody Member user) throws NotExistMethodName {
         //check input parameter
-        checkInputParameter(new String[]{"email", "passwd"}, user);
-
+        user.checkNecessary(new String[]{"email", "passwd"},Member.getters);
         return ResponseEntity.status(HttpStatus.OK).body(String.format(CustomMessage.RETURN_SUCCESS_FORMAT.format, "login success"));
     }
 
 
     // Register : uri : Register, method : get, post,
-    @GetMapping
+    @GetMapping("/Register")
     public String registerGet() {
         return "/MemberController/RegisterPage.html";
     }
 
-    @PostMapping
-    ResponseEntity<?> postRegister(@RequestBody Map<String, Object> reqeustMap, @Autowired MemberService service) throws NotExistMethodName {
-        Member member = objectMapper.convertValue(reqeustMap.get("member"), Member.class);
-        String emailKey = (String)reqeustMap.get("emailKey");
+    @PostMapping("/Register")
+    ResponseEntity<?> postRegister(@RequestBody Map<String, String> reqeustMap) throws NotExistMethodName {
+        Member member = new Member().setEmail(reqeustMap.get("email")).setPasswd(reqeustMap.get("passwd")).setName(reqeustMap.get("name"));
+        String emailKey = reqeustMap.get("key");
 
-        checkInputParameter(new String[]{"email", "passwd", "name"}, member);
-
+        member.checkNecessary(new String[]{"email", "passwd", "name"}, Member.getters);
         service.addMember(member, emailKey);
 
         return ResponseEntity.status(HttpStatus.OK).body(String.format(CustomMessage.RETURN_SUCCESS_FORMAT.format, "register success"));
+    }
+
+    @PutMapping("/Register")
+    ResponseEntity<?> putRegister(@RequestBody Map<String, String> reqeustMap) throws NotExistMethodName {
+        String email = reqeustMap.get("email");
+
+        service.sendEmail(email);
+
+        return ResponseEntity.status(HttpStatus.OK).body(String.format(CustomMessage.RETURN_SUCCESS_FORMAT.format, "check email"));
     }
 }

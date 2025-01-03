@@ -5,8 +5,9 @@
 
 소셜로그인 : 나중에
 
-error 모두 badrequest 반환 : 대신 반환 객체에 erro number와 error message를 반환 
-	대신 front에서는 error message만 alert 해줘도 문제 없을정도로 만들기!!
+Exception 사용법 정리하고 기록하기
+
+
 
 test code 작성하기 + 작성법 코드로 남기기
 

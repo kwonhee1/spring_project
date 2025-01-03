@@ -11,10 +11,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MemberService {
-    @Autowired
     private MemberRepository memberRepository;
-    @Autowired
     private EmailService emailService;
+
+    @Autowired
+    public MemberService(EmailService emailService, MemberRepository memberRepository) {
+        this.emailService = emailService;
+        this.memberRepository = memberRepository;
+    }
 
     public void addMember(Member member, String keyCode){
         // check conflict
@@ -28,12 +32,12 @@ public class MemberService {
         memberRepository.addMember(member);
     }
 
-    public void sendEmail(Member member){
+    public void sendEmail(String email){
         // check conflict
-        validateNotExistEmail(member.getEmail());
+        validateNotExistEmail(email);
 
         //send email
-        emailService.sendEmial(member.getEmail());
+        emailService.sendEmial(email);
     }
 
     private void validateNotExistEmail(String email){

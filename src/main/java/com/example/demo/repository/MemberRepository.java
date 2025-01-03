@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface MemberRepository {
     // register
-    public abstract void addMember(@Param("member") Member member);
+    public void addMember(@Param("member") Member member);
     // check Email
-    public abstract boolean isExistEmail(String email);
+    public boolean isExistEmail(String email);
 
 }

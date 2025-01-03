@@ -5,9 +5,7 @@ import org.springframework.stereotype.Component;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 @Component
 public class EmailService {
@@ -20,25 +18,45 @@ public class EmailService {
     public void sendEmial(String toEmail){
         String emailKey = createEmailKey();
         sendEmail(toEmail, emailKey);
-        map.put(emailKey, new Pair(toEmail));
+        System.out.println("email: "+ toEmail +", emailKey: "+ emailKey);
+        map.put(emailKey, new Pair(toEmail)); // 같은 key값에 새로운 값을 넣으면 덮어쓰기 처리됨
     }
 
     public boolean checkEmailKey(String email, String emailKey){
+        // update Key Map
+        checkTime();
+
         Pair pair = map.get(emailKey);
         if(pair == null || !pair.email.equals(email))
             return false;
 
-        // update map
+        // update map  erase key
+        map.remove(emailKey);
+
         return true;
     }
 
     private String createEmailKey(){
-        return "11111";
+        Random random = new Random(System.currentTimeMillis());
+        String key = String.format("%05d", random.nextInt(100000));
+
+        if(map.get(key) != null)
+            key = createEmailKey();
+
+        return key;
     }
 
     // check time before check Email Key method >> emailkey값을 확인하기전에 시간 지난것들은 모두 만료 처리
     private void checkTime(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.MINUTE, 3);
+        Date now = calendar.getTime(); // 1분 전으로 설정 (1분전에 생성된건 모두 버림)
 
+        for(String e : map.keySet()){
+            if(now.before(map.get(e).createDate))
+                map.remove(e);
+        }
     }
 
     private void sendEmail(String toEmail, String emailKey){
@@ -50,8 +68,8 @@ public class EmailService {
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true"); // TLS 설정
-        props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // 최신 TLS 버전 지정
 
+        // 세션 생성
         Session session = Session.getInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(myEmail, myPasswd);
@@ -64,7 +82,7 @@ public class EmailService {
             message.setFrom(new InternetAddress(myEmail));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
             message.setSubject("Login Email Subject");
-            message.setText("인증 코드 5자리 : " + String.format("%05d", emailKey));
+            message.setText("인증 코드 5자리 : " + emailKey);
 
             // 이메일 전송
             Transport.send(message);

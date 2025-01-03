@@ -6,9 +6,8 @@
 
     <script>
         async function submitForm() {
-            const id = document.querySelector('input[name="id"]').value;
+            const email = document.querySelector('input[name="email"]').value;
             const passwd = document.querySelector('input[name="passwd"]').value;
-            const other = "other";
 
             try {
                 const response = await fetch('/Login', {
@@ -16,7 +15,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ id, passwd, other }),
+                    body: JSON.stringify({ email, passwd }),
                 });
 
                 if (response.ok) {
@@ -32,7 +31,7 @@
     </script>
 </head>
 <body>
-    id : <input type="text" name="id"/>
+    email : <input type="text" name="email"/>
     passwd : <input type="text" name="passwd"/>
     <button onclick="submitForm()">제출</button>
 </body>

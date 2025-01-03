@@ -4,7 +4,11 @@
 
 <mapper namespace="com.example.demo.repository.MemberRepository">
     <insert id="addMember">
-        INSERT INTO member(email, passwd)
-        VALUES (#{member.email}, #{member.passwd});
+        INSERT INTO member(email, passwd, name)
+        VALUES (#{member.email}, #{member.passwd}, #{member.name});
+    </insert>
+
+    <insert id="isExistEmail">
+        select if (count(*) > 0,TRUE,FALSE) from member where email = #{email};
     </insert>
 </mapper>
