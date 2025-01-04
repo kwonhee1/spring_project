@@ -29,12 +29,12 @@ public class MemberController {
     }
 
     // do login and return Http Status, token
-    @PostMapping("/Login")
-    public ResponseEntity<?> postLogin(@RequestBody Member user) throws NotExistMethodName {
-        //check input parameter
-        user.checkNecessary(new String[]{"email", "passwd"},Member.getters);
-        return ResponseEntity.status(HttpStatus.OK).body(String.format(CustomMessage.RETURN_SUCCESS_FORMAT.format, "login success"));
-    }
+//    @PostMapping("/Login")
+//    public ResponseEntity<?> postLogin(@RequestBody Member user) throws NotExistMethodName {
+//        //check input parameter
+//        user.checkNecessary(new String[]{"email", "passwd"},Member.getters);
+//        return ResponseEntity.status(HttpStatus.OK).body(String.format(CustomMessage.RETURN_SUCCESS_FORMAT.format, "login success"));
+//    }
 
 
     // Register : uri : Register, method : get, post,

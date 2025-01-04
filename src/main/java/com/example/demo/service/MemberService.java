@@ -25,7 +25,10 @@ public class MemberService {
 //    }
 
     public Member getMemberByEmail(String email){
-        return memberRepository.getMemberByEmail(email);
+        Member member = memberRepository.getMemberByEmail(email);
+        if(member == null)
+            throw new CustomException(CustomTitle.NOT_FOUND, CustomMessage.NO_EXIST_EMAIL);
+        return member;
     }
 
     public void addMember(Member member, String keyCode){

@@ -1,44 +1,43 @@
-package com.example.demo.config;
+package com.example.demo.config.security;
 
-import com.example.demo.config.CustomDaoAuthenticationProvder.CustomJsonLoginDaoAuthenticationProvider;
-import com.example.demo.config.filters.CustomJsonLoginFilter;
-import com.example.demo.model.Member;
+import com.example.demo.config.security.CustomDaoAuthenticationProvder.CustomJsonLoginDaoAuthenticationProvider;
+import com.example.demo.config.security.filters.CustomJsonLoginFilter;
+import com.example.demo.exception.http.CustomException;
 import com.example.demo.model.Role;
 import com.example.demo.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.Filter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig  {
+    // for filter
     private MemberService memberService;
     private ObjectMapper objectMapper;
+    private HandlerExceptionResolver handlerExceptionResolver;
 
     @Autowired
-     public SecurityConfig(ObjectMapper objectMapper, MemberService memberService) {
+     public SecurityConfig(ObjectMapper objectMapper, MemberService memberService,@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
          this.memberService = memberService;
          this.objectMapper = objectMapper;
+
+         this.handlerExceptionResolver = resolver;
      }
 
     @Bean
@@ -60,6 +59,9 @@ public class SecurityConfig  {
                 )
                 // .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .sessionManagement(SessionManagementConfigurer::disable)
+
+                // exception handler 설정 authenticationEntryPotin
+                .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer.authenticationEntryPoint(authenticationEntryPoint()))
 
                 // 접근 설정
                 .authorizeHttpRequests(authorizeHttpRequestsConfigurer ->
@@ -91,6 +93,16 @@ public class SecurityConfig  {
 
     @Bean
     public CustomJsonLoginFilter customJsonLoginFilter() {
-        return new CustomJsonLoginFilter(daoAuthenticationProvider(), objectMapper).getCustomTokenFilter();
+        return new CustomJsonLoginFilter(daoAuthenticationProvider(), objectMapper, authenticationEntryPoint()).getCustomTokenFilter();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new AuthenticationEntryPoint(){
+            @Override
+            public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+                handlerExceptionResolver.resolveException(request, response, null, authException);
+            }
+        };
     }
 }

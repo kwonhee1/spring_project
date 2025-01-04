@@ -1,4 +1,4 @@
-package com.example.demo.config.CustomDaoAuthenticationProvder;
+package com.example.demo.config.security.CustomDaoAuthenticationProvder;
 
 import com.example.demo.exception.http.CustomException;
 import com.example.demo.exception.http.view.CustomMessage;

@@ -1,4 +1,4 @@
-package com.example.demo.config.filters;
+package com.example.demo.config.security.filters;
 
 import com.example.demo.model.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
