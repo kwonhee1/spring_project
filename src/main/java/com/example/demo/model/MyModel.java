@@ -32,7 +32,7 @@ public class MyModel {
             Method getter = getters.get(necess);
 
             try {
-                if( ((String)getter.invoke(this)).isEmpty() )
+                if( (getter.invoke(this)).toString().isEmpty() )
                     throw new CustomException(CustomTitle.NO_NECESSARY_PARAMETER, CustomMessage.NO_NECESSARY_INPUT, necess);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();

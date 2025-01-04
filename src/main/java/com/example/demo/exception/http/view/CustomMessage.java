@@ -8,8 +8,12 @@ public enum CustomMessage {
 
     // Custom Exception Messages
 
-    // login
+    // model
     NO_NECESSARY_INPUT("%s is necessary for this request"),
+
+    // login
+    PASSWD_NOT_CORRECT("password is not correct"),
+    NO_EXIST_EMAIL("email address is not exist"),
 
     // register
     EAMIL_ALREADY_EXIST("%s is already exist"),

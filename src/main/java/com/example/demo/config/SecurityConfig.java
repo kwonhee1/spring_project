@@ -1,27 +1,43 @@
 package com.example.demo.config;
 
-import com.example.demo.config.security_filters.CustomJsonLoginFilter;
-import com.example.demo.config.security_filters.CustomTokenFilter;
+import com.example.demo.config.CustomDaoAuthenticationProvder.CustomJsonLoginDaoAuthenticationProvider;
+import com.example.demo.config.filters.CustomJsonLoginFilter;
+import com.example.demo.model.Member;
 import com.example.demo.model.Role;
+import com.example.demo.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.Filter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig  {
-    ObjectMapper objectMapper;
+    private MemberService memberService;
+    private ObjectMapper objectMapper;
 
     @Autowired
-     public SecurityConfig(ObjectMapper objectMapper) {
+     public SecurityConfig(ObjectMapper objectMapper, MemberService memberService) {
+         this.memberService = memberService;
          this.objectMapper = objectMapper;
      }
 
@@ -63,21 +79,18 @@ public class SecurityConfig  {
                 ;
         // login logout filter 추가
             // json 객체
-//        http.addFilterAfter(customFilter(), LogoutFilter.class);
+        http.addFilterAfter(customJsonLoginFilter(), LogoutFilter.class);
 //        http.addFilterBefore()
         return http.build();
     }
 
     @Bean
-    public CustomJsonLoginFilter customJsonLoginFilter() {
-        CustomJsonLoginFilter filter = new CustomJsonLoginFilter(objectMapper);
-        filter.setAuthenticationManager();
-        filter.setAuthenticationSuccessHandler((request, response, authentication) -> {});
-        filter.setAuthenticationFailureHandler((request, response, exception) -> {});
+    public CustomJsonLoginDaoAuthenticationProvider daoAuthenticationProvider() {
+        return new CustomJsonLoginDaoAuthenticationProvider(memberService).getLoginDaoAuthenticationProvider();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    public CustomJsonLoginFilter customJsonLoginFilter() {
+        return new CustomJsonLoginFilter(daoAuthenticationProvider(), objectMapper).getCustomTokenFilter();
     }
 }

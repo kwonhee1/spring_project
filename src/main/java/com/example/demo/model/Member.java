@@ -1,6 +1,8 @@
 package com.example.demo.model;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +12,7 @@ public class Member extends MyModel {
     private String passwd;  // not null
     private String name;
 
-    private Role role;      // check role in("user", "admin") default "user"
+    private ArrayList<String> role = new ArrayList<>();      // check role in("user", "admin") default "user"
 
     public static Map<String, Method> getters = new HashMap<>();
 
@@ -42,8 +44,11 @@ public class Member extends MyModel {
         this.email = email;
         return this;
     }
-    public Role getRole() {return role;}
-    public Member setRole(Role role) {this.role = role;
+    public Collection<String> getRole() {
+        return role;
+    }
+    public Member setRole(String role) {
+        this.role.add(role);
         return this;
     }
 

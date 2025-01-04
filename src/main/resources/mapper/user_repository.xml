@@ -3,12 +3,20 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.demo.repository.MemberRepository">
+<!--    <insert id="login">-->
+<!--        select if (count(*) = 1,TRUE,FALSE) from member where email = #{email} and passwd = #{passwd};-->
+<!--    </insert>-->
+
+    <select id="getMemberByEmail" resultType="com.example.demo.model.Member">
+        select * from member where email = #{email};
+    </select>
+
     <insert id="addMember">
         INSERT INTO member(email, passwd, name)
         VALUES (#{member.email}, #{member.passwd}, #{member.name});
     </insert>
 
-    <insert id="isExistEmail">
+    <select id="isExistEmail">
         select if (count(*) > 0,TRUE,FALSE) from member where email = #{email};
-    </insert>
+    </select>
 </mapper>

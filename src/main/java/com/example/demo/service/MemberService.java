@@ -20,6 +20,14 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
+//    public boolean login(String email, String passwd){
+//        return memberRepository.login(email, passwd);
+//    }
+
+    public Member getMemberByEmail(String email){
+        return memberRepository.getMemberByEmail(email);
+    }
+
     public void addMember(Member member, String keyCode){
         // check conflict
         validateNotExistEmail(member.getEmail());

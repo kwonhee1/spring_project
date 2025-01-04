@@ -1,4 +1,4 @@
-package com.example.demo.config.security_filters;
+package com.example.demo.config.filters;
 
 import com.example.demo.model.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,13 +13,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
-public class CustomJsonLoginFilter  extends AbstractAuthenticationProcessingFilter {
+public class CustomTokenFilter extends AbstractAuthenticationProcessingFilter {
     private static final String FILTER_URI = "/Login";
     private static final String FILTER_METHOD = "post";
 
     private final ObjectMapper objectMapper;
 
-    public CustomJsonLoginFilter(ObjectMapper objectMapper) {
+    public CustomTokenFilter(ObjectMapper objectMapper) {
         super(new AntPathRequestMatcher(FILTER_URI, FILTER_METHOD));
         this.objectMapper = objectMapper;
     }
