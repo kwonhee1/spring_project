@@ -1,9 +1,6 @@
 package com.example.demo.config.security.filters;
 
-import com.example.demo.config.security.CustomDaoAuthenticationProvder.CustomJsonLoginDaoAuthenticationProvider;
-import com.example.demo.exception.http.CustomException;
-import com.example.demo.exception.http.view.CustomMessage;
-import com.example.demo.exception.http.view.CustomTitle;
+import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.model.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

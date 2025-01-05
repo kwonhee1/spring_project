@@ -1,4 +1,4 @@
-package com.example.demo.config.security.CustomDaoAuthenticationProvder;
+package com.example.demo.config.security.provider;
 
 import com.example.demo.exception.http.CustomException;
 import com.example.demo.exception.http.view.CustomMessage;
@@ -32,18 +32,19 @@ public class CustomJsonLoginDaoAuthenticationProvider extends DaoAuthenticationP
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = (String) authentication.getPrincipal();
-        String passwd = (String) authentication.getCredentials();
+        Member member = (Member) authentication.getCredentials();
 
-        UserDetails db = getUserDetailsService().loadUserByUsername(email);
-        additionalAuthenticationChecks(db, (UsernamePasswordAuthenticationToken) authentication);
+        Member db = (Member)getUserDetailsService().loadUserByUsername(email);
 
-        return new UsernamePasswordAuthenticationToken(email, passwd, db.getAuthorities());
+        additionalAuthenticationChecks(db, (UsernamePasswordAuthenticationToken)authentication);
+
+        return new UsernamePasswordAuthenticationToken(email, db, db.getAuthorities());
     }
 
     // getUserDetails함수를 통해 db에서 authetication의 Member정보를 가져옴 -> 두개를 비교함 : 진짜 로그인 과정
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        String inputPasswd = (String) authentication.getCredentials();
+        String inputPasswd = ((Member) authentication.getCredentials()).getPasswd();
         if (!userDetails.getPassword().equals(inputPasswd)) {
             throw new CustomException(CustomTitle.BAD_REQUEST, CustomMessage.PASSWD_NOT_CORRECT);
         }
@@ -53,13 +54,7 @@ public class CustomJsonLoginDaoAuthenticationProvider extends DaoAuthenticationP
         // spring 에서 제공하는 passwd 암호화 factory
         this.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
         this.setUserDetailsService((email)->{
-            Member member = memberService.getMemberByEmail(email);
-
-            User.UserBuilder user = User.builder().username(member.getEmail()).password(member.getPasswd());
-
-            member.getRole().forEach(role-> user.authorities(role));
-
-            return user.build();
+            return memberService.getMemberByEmail(email);
         });
         return this;
     }

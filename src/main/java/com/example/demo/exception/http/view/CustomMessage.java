@@ -19,6 +19,9 @@ public enum CustomMessage {
     EAMIL_ALREADY_EXIST("%s is already exist"),
     INVALID_EMAIL_KEY("email key is invalid");
 
+    // Permission
+
+
     public String format;
 
     CustomMessage(String format) {this.format = format;}

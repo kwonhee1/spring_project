@@ -31,7 +31,7 @@ public class CustomTokenFilter extends AbstractAuthenticationProcessingFilter {
         Member member = objectMapper.readValue(request.getReader().readLine(), Member.class);
         member.checkNecessary(new String[]{"email","passwd"}, Member.getters);
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPasswd());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(member.getEmail(), member);
         return getAuthenticationManager().authenticate(usernamePasswordAuthenticationToken);
     }
 }

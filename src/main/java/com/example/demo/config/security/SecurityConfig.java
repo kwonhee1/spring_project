@@ -1,9 +1,8 @@
 package com.example.demo.config.security;
 
-import com.example.demo.config.security.CustomDaoAuthenticationProvder.CustomJsonLoginDaoAuthenticationProvider;
+import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.config.security.filters.CustomJsonLoginFilter;
-import com.example.demo.exception.http.CustomException;
-import com.example.demo.model.Role;
+import com.example.demo.role.Permission;
 import com.example.demo.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -67,7 +66,7 @@ public class SecurityConfig  {
                 .authorizeHttpRequests(authorizeHttpRequestsConfigurer ->
                         authorizeHttpRequestsConfigurer
                                 .requestMatchers("/", "/Register", "/Login", "/login").permitAll()
-                                .requestMatchers("/AdminPage").hasRole(Role.ADMIN.role)
+                                .requestMatchers("/AdminPage").hasRole(Permission.ADMIN.permission)
                                 .anyRequest().authenticated()
                 )
 

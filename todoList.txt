@@ -1,13 +1,11 @@
 
 1. 어노테이션 공부하기 : ok
-3. security공부 : 공부 진행중 !!!
+3. security공부 : 개발 중 !!! -> token 도입
 4. aop 공부하기 ok
 
 소셜로그인 : 나중에
 
 Exception 사용법 정리하고 기록하기
-
-
 
 test code 작성하기 + 작성법 코드로 남기기
 
