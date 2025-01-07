@@ -1,14 +1,9 @@
 package com.example.demo.role;
 
-import com.example.demo.exception.http.CustomException;
-import com.example.demo.exception.http.view.CustomMessage;
-import com.example.demo.exception.http.view.CustomTitle;
-import org.springframework.security.core.GrantedAuthority;
-
 import java.util.ArrayList;
 
 public enum MemberRole {
-    USER(Permission.USER), ADMIN(Permission.USER, Permission.ADMIN);
+    USER(Permission.PAGE_USER), ADMIN(Permission.PAGE_ADMIN, Permission.PAGE_ADMIN);
 
     public final ArrayList<Permission> role = new ArrayList<>();
 
@@ -25,11 +20,5 @@ public enum MemberRole {
             }
         }
         throw new IllegalArgumentException("MemberRole can not find role name " + roleName);
-    }
-
-    public String toString() {
-        if(role.isEmpty())
-            return "";
-        else return role.toString();
     }
 }

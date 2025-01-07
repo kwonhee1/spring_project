@@ -4,6 +4,7 @@ import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticatio
 import com.example.demo.config.security.filters.CustomJsonLoginFilter;
 import com.example.demo.role.Permission;
 import com.example.demo.service.MemberService;
+import com.example.demo.utils.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -30,13 +32,16 @@ public class SecurityConfig  {
     private MemberService memberService;
     private ObjectMapper objectMapper;
     private HandlerExceptionResolver handlerExceptionResolver;
+    private JWTService jwtService;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-     public SecurityConfig(ObjectMapper objectMapper, MemberService memberService,@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+     public SecurityConfig(ObjectMapper objectMapper, MemberService memberService,@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver, JWTService jwtService, PasswordEncoder passwordEncoder) {
          this.memberService = memberService;
          this.objectMapper = objectMapper;
-
          this.handlerExceptionResolver = resolver;
+         this.jwtService = jwtService;
+         this.passwordEncoder = passwordEncoder;
      }
 
     @Bean
@@ -66,9 +71,18 @@ public class SecurityConfig  {
                 .authorizeHttpRequests(authorizeHttpRequestsConfigurer ->
                         authorizeHttpRequestsConfigurer
                                 .requestMatchers("/", "/Register", "/Login", "/login").permitAll()
-                                .requestMatchers("/AdminPage").hasRole(Permission.ADMIN.permission)
+                                .requestMatchers("/AdminPage").hasRole(Permission.PAGE_ADMIN.permission)
                                 .anyRequest().authenticated()
                 )
+//                .authorizeHttpRequests(
+//                        new Customizer<AuthorizeHttpRequestsConfigurer<org.springframework.security.config.annotation.web.builders.HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>() {
+//                            @Override
+//                            public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorizationManagerRequestMatcherRegistry) {
+//                                authorizationManagerRequestMatcherRegistry
+//                                        .requestMatchers("","","").permitAll();
+//                            }
+//                        }
+//                )
 
                 // oauth2Login social login 부분
 
@@ -87,12 +101,12 @@ public class SecurityConfig  {
 
     @Bean
     public CustomJsonLoginDaoAuthenticationProvider daoAuthenticationProvider() {
-        return new CustomJsonLoginDaoAuthenticationProvider(memberService).getLoginDaoAuthenticationProvider();
+        return new CustomJsonLoginDaoAuthenticationProvider(memberService, passwordEncoder).getLoginDaoAuthenticationProvider();
     }
 
     @Bean
     public CustomJsonLoginFilter customJsonLoginFilter() {
-        return new CustomJsonLoginFilter(daoAuthenticationProvider(), objectMapper, authenticationEntryPoint()).getCustomTokenFilter();
+        return new CustomJsonLoginFilter(daoAuthenticationProvider(), objectMapper, authenticationEntryPoint(), jwtService).getCustomTokenFilter();
     }
 
     @Bean

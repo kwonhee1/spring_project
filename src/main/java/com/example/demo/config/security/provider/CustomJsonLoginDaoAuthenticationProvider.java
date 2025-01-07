@@ -1,5 +1,6 @@
 package com.example.demo.config.security.provider;
 
+import com.example.demo.config.security.authentication.CustomAuthentication;
 import com.example.demo.exception.http.CustomException;
 import com.example.demo.exception.http.view.CustomMessage;
 import com.example.demo.exception.http.view.CustomTitle;
@@ -9,9 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /*
     provider는 filter로부터 request에서 얻은 Member정보를 security Authentication class로 받게됨
@@ -23,36 +22,32 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
  */
 public class CustomJsonLoginDaoAuthenticationProvider extends DaoAuthenticationProvider {
     private MemberService memberService;
+    private PasswordEncoder passwordEncoder;
 
-    public CustomJsonLoginDaoAuthenticationProvider(MemberService memberService) {
+    public CustomJsonLoginDaoAuthenticationProvider(MemberService memberService, PasswordEncoder passwordEncoder) {
         this.memberService = memberService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // authentication에 이상이 있는지 확인함
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = (String) authentication.getPrincipal();
-        Member member = (Member) authentication.getCredentials();
+        String inputPasswd = (String) authentication.getCredentials();
 
-        Member db = (Member)getUserDetailsService().loadUserByUsername(email);
+        Member dbMember = (Member)getUserDetailsService().loadUserByUsername(email);
 
-        additionalAuthenticationChecks(db, (UsernamePasswordAuthenticationToken)authentication);
-
-        return new UsernamePasswordAuthenticationToken(email, db, db.getAuthorities());
-    }
-
-    // getUserDetails함수를 통해 db에서 authetication의 Member정보를 가져옴 -> 두개를 비교함 : 진짜 로그인 과정
-    @Override
-    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        String inputPasswd = ((Member) authentication.getCredentials()).getPasswd();
-        if (!userDetails.getPassword().equals(inputPasswd)) {
+        // check passwd
+        if(!getPasswordEncoder().matches(inputPasswd, dbMember.getPasswd())) {
             throw new CustomException(CustomTitle.BAD_REQUEST, CustomMessage.PASSWD_NOT_CORRECT);
         }
+
+        return new UsernamePasswordAuthenticationToken(email, null, dbMember.getAuthorities());
     }
 
     public CustomJsonLoginDaoAuthenticationProvider getLoginDaoAuthenticationProvider() {
         // spring 에서 제공하는 passwd 암호화 factory
-        this.setPasswordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder());
+        this.setPasswordEncoder(passwordEncoder);
         this.setUserDetailsService((email)->{
             return memberService.getMemberByEmail(email);
         });

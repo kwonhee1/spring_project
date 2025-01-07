@@ -7,17 +7,20 @@ import com.example.demo.model.Member;
 import com.example.demo.repository.MemberRepository;
 import com.example.demo.utils.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MemberService {
     private MemberRepository memberRepository;
     private EmailService emailService;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public MemberService(EmailService emailService, MemberRepository memberRepository) {
+    public MemberService(EmailService emailService, MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.emailService = emailService;
         this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 //    public boolean login(String email, String passwd){
@@ -39,6 +42,8 @@ public class MemberService {
         if(!emailService.checkEmailKey(member.getEmail(), keyCode))
             throw new CustomException(CustomTitle.ALREADY_EXISTS, CustomMessage.INVALID_EMAIL_KEY);
 
+        // encode passwd
+        member.setPasswd(passwordEncoder.encode(member.getPasswd()));
         // add member to db
         memberRepository.addMember(member);
     }

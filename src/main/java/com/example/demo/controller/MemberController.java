@@ -9,6 +9,7 @@ import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,7 @@ public class MemberController {
         return "/MemberController/RegisterPage.html";
     }
 
+    // register
     @PostMapping("/Register")
     ResponseEntity<?> postRegister(@RequestBody Map<String, String> reqeustMap) throws NotExistMethodName {
         Member member = new Member().setEmail(reqeustMap.get("email")).setPasswd(reqeustMap.get("passwd")).setName(reqeustMap.get("name"));
@@ -54,6 +56,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(String.format(CustomMessage.RETURN_SUCCESS_FORMAT.format, "register success"));
     }
 
+    // send Email
     @PutMapping("/Register")
     ResponseEntity<?> putRegister(@RequestBody Map<String, String> reqeustMap) throws NotExistMethodName {
         String email = reqeustMap.get("email");

@@ -4,7 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 public enum Permission implements GrantedAuthority {
     // page
-    USER("page_user"), ADMIN("page_admin");
+    PAGE_USER("page_user"), PAGE_ADMIN("page_admin");
 
     // others
 

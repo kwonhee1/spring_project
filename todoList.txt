@@ -1,6 +1,9 @@
 
 1. 어노테이션 공부하기 : ok
 3. security공부 : 개발 중 !!! -> token 도입
+	securityContextHolder에 Authentication저장 막기
+	access token cookie위에 올리기
+	token filter 
 4. aop 공부하기 ok
 
 소셜로그인 : 나중에

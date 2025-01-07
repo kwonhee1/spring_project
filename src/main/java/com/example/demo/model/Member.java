@@ -49,6 +49,12 @@ public class Member extends MyModel implements UserDetails{
         roles.addAll(role);
         return this;
     }
+    public String getRoles() {
+        if(roles.isEmpty()){
+            return "";
+        }
+        return roles.toString();
+    }
 
     @Override
     public String toString() {

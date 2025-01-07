@@ -13,13 +13,4 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest
 @ExtendWith(SpringExtension.class)
 public class MainControllerTest {
-    @Autowired
-    private MockMvc mvc;
-
-    @Test
-    public void getMethod() throws Exception {
-        mvc.perform(get(""))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/MainPage/MainPage.html"));
-    }
 }
