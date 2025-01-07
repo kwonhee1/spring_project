@@ -21,7 +21,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import java.io.IOException;
 import java.util.List;
 
-public class CustomJsonLoginFilter extends AbstractAuthenticationProcessingFilter {
+public class CustomJsonLoginFilter extends CustomFilter {
     private static final String FILTER_URI = "/Login";
     private static final String FILTER_METHOD = "POST";
 
@@ -40,6 +40,7 @@ public class CustomJsonLoginFilter extends AbstractAuthenticationProcessingFilte
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
+        System.out.println("custom json login filter");
         request.setCharacterEncoding("UTF-8");
         Member member = objectMapper.readValue(request.getReader().readLine(), Member.class);
         member.checkNecessary(new String[]{"email","passwd"}, Member.getters);
@@ -54,8 +55,8 @@ public class CustomJsonLoginFilter extends AbstractAuthenticationProcessingFilte
             authenticationEntryPoint.commence(request, response, exception);
         });
         this.setAuthenticationSuccessHandler((request, response, authentication) -> {
-            String token = jwtService.createAccessToken((String)authentication.getPrincipal(), authentication.getAuthorities(), getIpFromRequest(request), request.getHeader("User-Agent"));
-            Cookie cookie = new Cookie("access_token", token);
+            String token = jwtService.createAccessToken((String)authentication.getPrincipal(), authentication.getAuthorities(), getIpFromRequest(request), getAgentFromRequest(request));
+            Cookie cookie = new Cookie(JWTService.ACCESS, token);
             cookie.setHttpOnly(false);
             cookie.setPath("/");
             response.addCookie(cookie);
@@ -64,19 +65,5 @@ public class CustomJsonLoginFilter extends AbstractAuthenticationProcessingFilte
         });
 
         return this;
-    }
-
-    private String getIpFromRequest(HttpServletRequest request) {
-        String ipAddress = request.getHeader("X-Forwarded-For");
-        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
-            ipAddress = request.getHeader("Proxy-Client-IP");
-        }
-        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
-            ipAddress = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
-            ipAddress = request.getRemoteAddr();
-        }
-        return ipAddress;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.config.security;
 
+import com.example.demo.config.security.filters.CustomTokenFilter;
 import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.config.security.filters.CustomJsonLoginFilter;
 import com.example.demo.role.Permission;
@@ -71,6 +72,7 @@ public class SecurityConfig  {
                 .authorizeHttpRequests(authorizeHttpRequestsConfigurer ->
                         authorizeHttpRequestsConfigurer
                                 .requestMatchers("/", "/Register", "/Login", "/login").permitAll()
+                                .requestMatchers("/User").hasRole(Permission.PAGE_USER.permission)
                                 .requestMatchers("/AdminPage").hasRole(Permission.PAGE_ADMIN.permission)
                                 .anyRequest().authenticated()
                 )
@@ -95,19 +97,25 @@ public class SecurityConfig  {
         // login logout filter 추가
             // json 객체
         http.addFilterAfter(customJsonLoginFilter(), LogoutFilter.class);
-//        http.addFilterBefore()
+        http.addFilterBefore(customTokenFilter(), CustomJsonLoginFilter.class);
         return http.build();
     }
 
+    // filter / provider
     @Bean
     public CustomJsonLoginDaoAuthenticationProvider daoAuthenticationProvider() {
         return new CustomJsonLoginDaoAuthenticationProvider(memberService, passwordEncoder).getLoginDaoAuthenticationProvider();
     }
-
     @Bean
     public CustomJsonLoginFilter customJsonLoginFilter() {
         return new CustomJsonLoginFilter(daoAuthenticationProvider(), objectMapper, authenticationEntryPoint(), jwtService).getCustomTokenFilter();
     }
+    @Bean
+    public CustomTokenFilter customTokenFilter(){
+        return new CustomTokenFilter(objectMapper, jwtService).customTokenFilter();
+    }
+
+    // entry point :: filter Handler에서 exception반환시 security밖으로 빼주는 역할 -> controller로 전송
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {

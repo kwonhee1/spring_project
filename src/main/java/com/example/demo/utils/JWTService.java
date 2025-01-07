@@ -21,12 +21,17 @@ import java.util.List;
 public class JWTService {
     private static final int ACCESS_TIME = 60 * 60 * 1000; // 1시간
     private static final String SECRET = "very_stronger_secret";
-    private static final String ACCESS = "access_token";
+    public static final String ACCESS = "access_token";
 
     private JWTVerifier jwtVerifier;
+    private DecodedJWT decodedJWT;
 
     public JWTService(){
         jwtVerifier = JWT.require(Algorithm.HMAC256(SECRET)).build();
+    }
+
+    public JWTService(DecodedJWT decodedJWT){
+        this.decodedJWT = decodedJWT;
     }
 
     public String createAccessToken(String email, Collection<? extends GrantedAuthority> authorities, String inputIp, String agent) {
@@ -40,7 +45,7 @@ public class JWTService {
                 .sign(Algorithm.HMAC256(SECRET));
     }
 
-    public DecodedJWT validateAccessToken(String token, String ip, String agent){
+    public JWTService validateAccessToken(String token, String ip, String agent){
         try{
             DecodedJWT decodedJWT = jwtVerifier.verify(token);
 
@@ -49,13 +54,14 @@ public class JWTService {
                 return null;
             }
 
-            return decodedJWT;
+            return new JWTService(decodedJWT);
         }catch (Exception e){
+            e.printStackTrace();
             return null;
         }
     }
 
-    public UsernamePasswordAuthenticationToken validateAccessToken(DecodedJWT decodedJWT){
+    public UsernamePasswordAuthenticationToken getAuthentication(){
         return new UsernamePasswordAuthenticationToken(decodedJWT.getClaim("email"), null, (Collection<? extends GrantedAuthority>) decodedJWT.getClaim("authorities"));
     }
 }

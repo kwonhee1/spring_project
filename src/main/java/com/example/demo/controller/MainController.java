@@ -13,11 +13,11 @@ public class MainController {
     @Autowired
     MemberService userService;
 
-    @GetMapping("/")
+    @GetMapping(URIMappers.MainPageURI)
     public String get(Model model) throws SQLException {
         model.addAttribute("message", "Hello World");
 
-        return "/MainPage/MainPage.html";
+        return URIMappers.MainPageHtml;
     }
 
 }

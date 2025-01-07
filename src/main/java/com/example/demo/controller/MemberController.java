@@ -23,20 +23,17 @@ public class MemberController {
     @Autowired
     private MemberService service;
 
+    // UserPage
+    @GetMapping(URIMappers.UserPageURI)
+    public String userPage(){
+        return URIMappers.UserPageHtml;
+    }
+
     // Login  : uri : Login, method : get, post
     @GetMapping("/Login")
     public String loginGet() {
         return "/MemberController/LoginPage.html";
     }
-
-    // do login and return Http Status, token
-//    @PostMapping("/Login")
-//    public ResponseEntity<?> postLogin(@RequestBody Member user) throws NotExistMethodName {
-//        //check input parameter
-//        user.checkNecessary(new String[]{"email", "passwd"},Member.getters);
-//        return ResponseEntity.status(HttpStatus.OK).body(String.format(CustomMessage.RETURN_SUCCESS_FORMAT.format, "login success"));
-//    }
-
 
     // Register : uri : Register, method : get, post,
     @GetMapping("/Register")
