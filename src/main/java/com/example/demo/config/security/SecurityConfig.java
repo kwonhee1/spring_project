@@ -1,9 +1,9 @@
 package com.example.demo.config.security;
 
-import com.example.demo.config.security.filters.CustomTokenFilter;
+import com.example.demo.config.security.filters.CustomAccessTokenFilter;
 import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.config.security.filters.CustomJsonLoginFilter;
-import com.example.demo.role.Permission;
+import com.example.demo.controller.URIMappers;
 import com.example.demo.service.MemberService;
 import com.example.demo.utils.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,9 +71,9 @@ public class SecurityConfig  {
                 // 접근 설정
                 .authorizeHttpRequests(authorizeHttpRequestsConfigurer ->
                         authorizeHttpRequestsConfigurer
-                                .requestMatchers("/", "/Register", "/Login", "/login").permitAll()
-                                .requestMatchers("/User").hasRole(Permission.PAGE_USER.permission)
-                                .requestMatchers("/AdminPage").hasRole(Permission.PAGE_ADMIN.permission)
+                                .requestMatchers(URIMappers.MainPageURI, URIMappers.RegisterPageURI, URIMappers.LoginPageURI).permitAll()
+                                .requestMatchers(URIMappers.UserPageURI).hasAuthority(URIMappers.UserRole)
+                                .requestMatchers(URIMappers.AdminPageURI).hasRole(URIMappers.AdminRole)
                                 .anyRequest().authenticated()
                 )
 //                .authorizeHttpRequests(
@@ -108,11 +108,11 @@ public class SecurityConfig  {
     }
     @Bean
     public CustomJsonLoginFilter customJsonLoginFilter() {
-        return new CustomJsonLoginFilter(daoAuthenticationProvider(), objectMapper, authenticationEntryPoint(), jwtService).getCustomTokenFilter();
+        return new CustomJsonLoginFilter(daoAuthenticationProvider(), objectMapper, authenticationEntryPoint(), jwtService);
     }
     @Bean
-    public CustomTokenFilter customTokenFilter(){
-        return new CustomTokenFilter(objectMapper, jwtService).customTokenFilter();
+    public CustomAccessTokenFilter customTokenFilter(){
+        return new CustomAccessTokenFilter(objectMapper, jwtService);
     }
 
     // entry point :: filter Handler에서 exception반환시 security밖으로 빼주는 역할 -> controller로 전송

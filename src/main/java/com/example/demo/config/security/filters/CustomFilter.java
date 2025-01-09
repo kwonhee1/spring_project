@@ -25,7 +25,6 @@ public abstract class CustomFilter extends AbstractAuthenticationProcessingFilte
         return request.getHeader("User-Agent");
     }
 
-
     protected CustomFilter(String defaultFilterProcessesUrl) {
         super(defaultFilterProcessesUrl);
     }

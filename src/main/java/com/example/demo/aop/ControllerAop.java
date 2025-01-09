@@ -24,7 +24,8 @@ public class ControllerAop {
         Object[] args = joinPoint.getArgs();
         //메서드에 들어가는 매개변수들에 대한 배열
         for(Object obj : args) {
-            builder.append("(").append(obj.getClass().getSimpleName()).append(":").append(obj).append("), ");
+            if (obj != null)
+                builder.append("(").append(obj.getClass().getSimpleName()).append(":").append(obj).append("), ");
             // (type:value), ...
         }
 

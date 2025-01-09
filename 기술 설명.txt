@@ -2,5 +2,18 @@ spring boot
 	spring security 
 		login form, session 사용 안함 (자체 token 발급)
 		참고 자료 : https://ksh-coding.tistory.com/70
-
+		
+		filter
+			1. refresh  token filter(access 가 있는지 검사하고 없다면 발급, user page만 검사)
+				성공 : access token을 가지고 다음 필터 진행
+				실패 : refresh token 지우고 로그인 페이지로 redirect
+			2. access token filter (login page검사안함)
+				성공 : authentication을 가지고 다음 filter 진행( 사실상 security종료)
+				실패 : access token 지우고 현재 request 로 redirect
+			3. login UserPassword filter
+				성공 : refresh token 발급(access발급은 보류), return 200; (front에서 이전페이지로 location 변경)
+				실패 : return 404, 원인 보내줌(front에서 처리)
+			4. logout filter (default filter not custom)
+				아직 미정
+		
 	aop

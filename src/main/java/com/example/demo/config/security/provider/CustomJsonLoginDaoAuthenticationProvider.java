@@ -29,6 +29,11 @@ public class CustomJsonLoginDaoAuthenticationProvider extends DaoAuthenticationP
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(CustomAuthentication.class);
+    }
+
     // authentication에 이상이 있는지 확인함
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -41,8 +46,13 @@ public class CustomJsonLoginDaoAuthenticationProvider extends DaoAuthenticationP
         if(!getPasswordEncoder().matches(inputPasswd, dbMember.getPasswd())) {
             throw new CustomException(CustomTitle.BAD_REQUEST, CustomMessage.PASSWD_NOT_CORRECT);
         }
+        System.out.println(dbMember.getRoles());
 
-        return new UsernamePasswordAuthenticationToken(email, null, dbMember.getAuthorities());
+        ((CustomAuthentication) authentication).setAuthenticated(true);
+        ((CustomAuthentication) authentication).setDetails(dbMember);
+        ((CustomAuthentication) authentication).setRoles(dbMember.getRoles());
+
+        return authentication;
     }
 
     public CustomJsonLoginDaoAuthenticationProvider getLoginDaoAuthenticationProvider() {

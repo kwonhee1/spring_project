@@ -60,7 +60,7 @@ public class EmailService {
     }
 
     private void sendEmail(String toEmail, String emailKey){
-        String myEmail = "jspproject2024@gmail.com", myPasswd = "ccdd thdn wdlz ywuw";
+        String myEmail = "jspproject2024@gmail.com", myPasswd = "bjmj zfyj ekkh gkos";
 
         // SMTP 설정
         Properties props = new Properties();

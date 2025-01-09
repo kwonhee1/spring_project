@@ -1,24 +1,30 @@
 package com.example.demo.role;
 
+import com.example.demo.controller.URIMappers;
+import com.example.demo.exception.http.CustomException;
+import com.example.demo.exception.http.view.CustomMessage;
+import com.example.demo.exception.http.view.CustomTitle;
+
 import java.util.ArrayList;
 
 public enum MemberRole {
-    USER(Permission.PAGE_USER), ADMIN(Permission.PAGE_ADMIN, Permission.PAGE_ADMIN);
+    MEMBER_USER("USER",URIMappers.UserRole), MEMBER_ADMIN("ADMIN",URIMappers.UserRole, URIMappers.AdminRole);
 
-    public final ArrayList<Permission> role = new ArrayList<>();
+    private String dbName;
+    public final ArrayList<String> role = new ArrayList<>();
 
-    MemberRole(Permission... role){
-        for(Permission permission : role){
+    MemberRole(String dbName ,String... role){
+        this.dbName = dbName;
+        for(String permission : role){
             this.role.add(permission);
         }
     }
-
-    public static MemberRole getRole(String roleName){
+    public static MemberRole getMemberRole(String dbName){
         for(MemberRole role : MemberRole.values()){
-            if(role.name().equals(roleName)){
+            if(role.dbName.equals(dbName)){
                 return role;
             }
         }
-        throw new IllegalArgumentException("MemberRole can not find role name " + roleName);
+        throw new CustomException(CustomTitle.NOT_FOUND, CustomMessage.ROLE_NOT_FOUND, dbName);
     }
 }

@@ -1,7 +1,8 @@
 package com.example.demo.model;
 
-import com.example.demo.role.Permission;
+import com.example.demo.role.MemberRole;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.lang.reflect.Method;
@@ -13,7 +14,7 @@ public class Member extends MyModel implements UserDetails{
     private String passwd;  // not null
     private String name;
 
-    private ArrayList<Permission> roles;      // check role in("user", "admin") default "user"
+    private ArrayList<String> roles = new ArrayList<>();      // check role in("user", "admin") default "user"
 
     public static Map<String, Method> getters = new HashMap<>();
 
@@ -45,15 +46,13 @@ public class Member extends MyModel implements UserDetails{
         this.email = email;
         return this;
     }
-    public Member addRole(Collection<Permission> role) {
-        roles.addAll(role);
+    public Member setRoles(String input) {
+        roles.addAll(MemberRole.getMemberRole(input).role);
+        System.out.println(roles);
         return this;
     }
-    public String getRoles() {
-        if(roles.isEmpty()){
-            return "";
-        }
-        return roles.toString();
+    public Collection<String> getRoles() {
+        return roles;
     }
 
     @Override
@@ -69,7 +68,11 @@ public class Member extends MyModel implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        for(String role : roles){
+            grantedAuthorities.add(new SimpleGrantedAuthority(role));
+        }
+        return grantedAuthorities;
     }
 
     @Override

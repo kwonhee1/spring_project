@@ -3,10 +3,8 @@ package com.example.demo.config.security.filters;
 import com.example.demo.config.security.authentication.CustomAuthentication;
 import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.model.Member;
-import com.example.demo.role.Permission;
 import com.example.demo.utils.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
@@ -36,6 +33,8 @@ public class CustomJsonLoginFilter extends CustomFilter {
         this.objectMapper = objectMapper;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.jwtService = jwtService;
+
+        createCustomTokenFilter();
     }
 
     @Override
@@ -45,25 +44,26 @@ public class CustomJsonLoginFilter extends CustomFilter {
         Member member = objectMapper.readValue(request.getReader().readLine(), Member.class);
         member.checkNecessary(new String[]{"email","passwd"}, Member.getters);
 
-        return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPasswd()));
+        return getAuthenticationManager().authenticate(new CustomAuthentication(member.getEmail(), member.getPasswd()));
     }
 
-    public CustomJsonLoginFilter getCustomTokenFilter() {
-        this.setAuthenticationManager(new ProviderManager(customJsonLoginProvider));
-        this.setAuthenticationFailureHandler((request, response, exception) -> {
-            //throw exception;
+    public void createCustomTokenFilter() {
+        setAuthenticationManager(new ProviderManager(customJsonLoginProvider));
+        setAuthenticationFailureHandler((request, response, exception) -> {
+            //throw exception;\
+            exception.printStackTrace();
             authenticationEntryPoint.commence(request, response, exception);
         });
-        this.setAuthenticationSuccessHandler((request, response, authentication) -> {
-            String token = jwtService.createAccessToken((String)authentication.getPrincipal(), authentication.getAuthorities(), getIpFromRequest(request), getAgentFromRequest(request));
+        setAuthenticationSuccessHandler((request, response, authentication) -> {
+            String token = jwtService.createAccessToken((String)authentication.getPrincipal(), (List<String>)((CustomAuthentication)authentication).getRoles(), getIpFromRequest(request), getAgentFromRequest(request));
             Cookie cookie = new Cookie(JWTService.ACCESS, token);
             cookie.setHttpOnly(false);
             cookie.setPath("/");
+            cookie.setMaxAge(60 * 60);  // 쿠키 유효시간 설정 (1시간)
             response.addCookie(cookie);
 
             response.setStatus(HttpServletResponse.SC_OK);
         });
 
-        return this;
     }
 }

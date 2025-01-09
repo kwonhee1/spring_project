@@ -31,6 +31,7 @@ public class MemberService {
         Member member = memberRepository.getMemberByEmail(email);
         if(member == null)
             throw new CustomException(CustomTitle.NOT_FOUND, CustomMessage.NO_EXIST_EMAIL);
+        System.out.println("service:"+ member.getAuthorities());
         return member;
     }
 

@@ -17,10 +17,15 @@ public enum CustomMessage {
 
     // register
     EAMIL_ALREADY_EXIST("%s is already exist"),
-    INVALID_EMAIL_KEY("email key is invalid");
+    INVALID_EMAIL_KEY("email key is invalid"),
 
-    // Permission
+    // Access token filter
+    NO_ACCESS_TOKEN("no access token"),
 
+    // Role from db is not found
+    ROLE_NOT_FOUND("%s role is not found"),
+
+    ;
 
     public String format;
 

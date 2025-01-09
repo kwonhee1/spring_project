@@ -6,26 +6,33 @@ import com.example.demo.model.Member;
 import com.example.demo.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.catalina.User;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.security.Principal;
 import java.util.Map;
 
 @Controller
 public class MemberController {
+    private static final Log log = LogFactory.getLog(MemberController.class);
     @Autowired
     private MemberService service;
 
     // UserPage
     @GetMapping(URIMappers.UserPageURI)
-    public String userPage(){
+    public String userPage(Principal email, Model model) {
+        System.out.println(email + ", " + email.getName());
+        model.addAttribute("email", email);
         return URIMappers.UserPageHtml;
     }
 
