@@ -1,6 +1,7 @@
 package com.example.demo.config.security.filters;
 
 import com.example.demo.config.security.CustomRequestMatchers;
+import com.example.demo.controller.URIMappers;
 import com.example.demo.exception.http.CustomException;
 import com.example.demo.exception.http.view.CustomMessage;
 import com.example.demo.exception.http.view.CustomTitle;
@@ -94,7 +95,7 @@ public class CustomAccessTokenFilter extends CustomFilter {
             cookie.setPath("/");
             cookie.setMaxAge(0);  // cookie 만료
             response.addCookie(cookie);
-            //response.sendRedirect(request.getContextPath());
+            response.sendRedirect(request.getContextPath()+ URIMappers.LoginPageURI);
         });
     }
 }
