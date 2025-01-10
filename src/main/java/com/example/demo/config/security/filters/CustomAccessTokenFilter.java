@@ -24,12 +24,10 @@ import java.util.Optional;
 
 public class CustomAccessTokenFilter extends CustomFilter {
 
-    private final ObjectMapper objectMapper;
     private JWTService jwtService;
 
-    public CustomAccessTokenFilter(ObjectMapper objectMapper, JWTService jwtService) {
+    public CustomAccessTokenFilter( JWTService jwtService) {
         super(new CustomRequestMatchers(CustomRequestMatchers.AccessTokenPattern, CustomRequestMatchers.ALL_METHOD));
-        this.objectMapper = objectMapper;
         this.jwtService = jwtService;
 
         createCustomTokenFilter();

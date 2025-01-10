@@ -112,7 +112,7 @@ public class SecurityConfig  {
     }
     @Bean
     public CustomAccessTokenFilter customTokenFilter(){
-        return new CustomAccessTokenFilter(objectMapper, jwtService);
+        return new CustomAccessTokenFilter( jwtService);
     }
 
     // entry point :: filter Handler에서 exception반환시 security밖으로 빼주는 역할 -> controller로 전송
