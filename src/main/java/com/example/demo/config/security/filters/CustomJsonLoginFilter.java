@@ -1,5 +1,6 @@
 package com.example.demo.config.security.filters;
 
+import com.example.demo.config.security.CustomRequestMatchers;
 import com.example.demo.config.security.authentication.CustomAuthentication;
 import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.model.Member;
@@ -28,7 +29,7 @@ public class CustomJsonLoginFilter extends CustomFilter {
     private JWTService jwtService;
 
     public CustomJsonLoginFilter(CustomJsonLoginDaoAuthenticationProvider customJsonLoginProvider, ObjectMapper objectMapper, AuthenticationEntryPoint authenticationEntryPoint, JWTService jwtService) {
-        super(new AntPathRequestMatcher(FILTER_URI, FILTER_METHOD));
+        super(new CustomRequestMatchers(CustomRequestMatchers.LoginPattern));
         this.customJsonLoginProvider = customJsonLoginProvider;
         this.objectMapper = objectMapper;
         this.authenticationEntryPoint = authenticationEntryPoint;
