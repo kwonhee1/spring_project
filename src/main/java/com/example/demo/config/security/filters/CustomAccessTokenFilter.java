@@ -27,7 +27,7 @@ public class CustomAccessTokenFilter extends CustomFilter {
     private JWTService jwtService;
 
     public CustomAccessTokenFilter(ObjectMapper objectMapper, JWTService jwtService) {
-        super(new CustomRequestMatchers(CustomRequestMatchers.AccessTokenPattern));
+        super(new CustomRequestMatchers(CustomRequestMatchers.AccessTokenPattern, CustomRequestMatchers.ALL_METHOD));
         this.objectMapper = objectMapper;
         this.jwtService = jwtService;
 
@@ -41,7 +41,6 @@ public class CustomAccessTokenFilter extends CustomFilter {
             chain.doFilter(request, response);
             return;
         }
-        System.out.println("Inside CustomAccessTokenFilter.doFilter");
 
         Authentication authentication = null; // 이전에 authentication객체를 생성하는 어떠한 filter도 존재하지 않음
         try{

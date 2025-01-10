@@ -1,5 +1,6 @@
 package com.example.demo.config.security.filters;
 
+import com.example.demo.config.security.CustomRequestMatchers;
 import com.example.demo.config.security.authentication.CustomAuthentication;
 import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.model.Member;
@@ -19,8 +20,6 @@ import java.io.IOException;
 import java.util.List;
 
 public class CustomJsonLoginFilter extends CustomFilter {
-    private static final String FILTER_URI = "/Login";
-    private static final String FILTER_METHOD = "POST";
 
     private CustomJsonLoginDaoAuthenticationProvider customJsonLoginProvider;
     private ObjectMapper objectMapper;
@@ -28,7 +27,7 @@ public class CustomJsonLoginFilter extends CustomFilter {
     private JWTService jwtService;
 
     public CustomJsonLoginFilter(CustomJsonLoginDaoAuthenticationProvider customJsonLoginProvider, ObjectMapper objectMapper, AuthenticationEntryPoint authenticationEntryPoint, JWTService jwtService) {
-        super(new AntPathRequestMatcher(FILTER_URI, FILTER_METHOD));
+        super(new CustomRequestMatchers(CustomRequestMatchers.LoginPattern, "POST"));
         this.customJsonLoginProvider = customJsonLoginProvider;
         this.objectMapper = objectMapper;
         this.authenticationEntryPoint = authenticationEntryPoint;
