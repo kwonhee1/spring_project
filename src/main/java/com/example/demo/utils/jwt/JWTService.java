@@ -1,4 +1,4 @@
-package com.example.demo.utils;
+package com.example.demo.utils.jwt;
 
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -20,9 +19,15 @@ public class JWTService {
     public static final String ACCESS = "access_token";
 
     private JWTVerifier jwtVerifier;
+    private ValidateFunctionInterface validateFunction;
 
     public JWTService(){
         jwtVerifier = JWT.require(Algorithm.HMAC256(SECRET)).build();
+    }
+
+    public JWTService setValidateFunction(ValidateFunctionInterface validateFunction) {
+        this.validateFunction = validateFunction;
+        return this;
     }
 
     public String createAccessToken(String email, List<String> authorities, String inputIp, String agent) {
@@ -36,14 +41,18 @@ public class JWTService {
                 .sign(Algorithm.HMAC256(SECRET));
     }
 
-    public Authentication getAuthentication(String token, String ip, String agent){
+    public Authentication getAuthentication(String token, String ip, String agent) {
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
 
+        validateFunction.validateFunction(decodedJWT, ip, agent);
+
+        return new CustomAuthentication(decodedJWT.getClaim("email").asString(), null, decodedJWT.getClaim("authorities").asList(String.class));
+    }
+
+    public static void validateTokenWithIp(DecodedJWT decodedJWT, String ip, String agent) {
         // ip and agent 확인
         if (!decodedJWT.getClaim("ip").asString().equals(ip) || !decodedJWT.getClaim("agent").asString().equals(agent)) {
             throw new RuntimeException("JWT verification failed");
         }
-
-        return new CustomAuthentication(decodedJWT.getClaim("email").asString(), null, decodedJWT.getClaim("authorities").asList(String.class));
     }
 }

@@ -5,8 +5,7 @@ import com.example.demo.controller.URIMappers;
 import com.example.demo.exception.http.CustomException;
 import com.example.demo.exception.http.view.CustomMessage;
 import com.example.demo.exception.http.view.CustomTitle;
-import com.example.demo.utils.JWTService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.demo.utils.jwt.JWTService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -72,7 +71,6 @@ public class CustomAccessTokenFilter extends CustomFilter {
 
         return jwtService
                 .getAuthentication(access_token.get().getValue(), getIpFromRequest(request), getAgentFromRequest(request));
-
     }
 
     public void createCustomTokenFilter() {

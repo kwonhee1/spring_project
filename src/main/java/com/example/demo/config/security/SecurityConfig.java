@@ -1,13 +1,16 @@
 package com.example.demo.config.security;
 
 import com.example.demo.config.security.filters.CustomAccessTokenFilter;
+import com.example.demo.config.security.filters.CustomFilter;
+import com.example.demo.config.security.filters.CustomTokenFilter;
 import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.config.security.filters.CustomJsonLoginFilter;
 import com.example.demo.controller.URIMappers;
 import com.example.demo.service.MemberService;
-import com.example.demo.utils.JWTService;
+import com.example.demo.utils.jwt.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -123,6 +128,29 @@ public class SecurityConfig  {
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
                 handlerExceptionResolver.resolveException(request, response, null, authException);
+            }
+        };
+    }
+
+    @Bean
+    public CustomFilter customAccessFilter() {
+        return new CustomTokenFilter(
+                JWTService.ACCESS,
+                new CustomRequestMatchers(CustomRequestMatchers.AccessTokenPattern, CustomRequestMatchers.ALL_METHOD) ,
+                new JWTService().setValidateFunction(JWTService::validateTokenWithIp)) {
+            @Override
+            protected void successHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                // 저장하는게 맞나?
+                // context를 만드는게 맞나? 그냥 get하기만 하면끝인가?
+            }
+            @Override
+            protected void failureHandler(HttpServletRequest request, HttpServletResponse response, Exception e) {
+                Cookie cookie = new Cookie(JWTService.ACCESS, "");
+                cookie.setHttpOnly(false);
+                cookie.setPath("/");
+                cookie.setMaxAge(0);  // cookie 만료
+                response.addCookie(cookie);
             }
         };
     }

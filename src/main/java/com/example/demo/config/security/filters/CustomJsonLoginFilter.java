@@ -4,17 +4,15 @@ import com.example.demo.config.security.CustomRequestMatchers;
 import com.example.demo.config.security.authentication.CustomAuthentication;
 import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.model.Member;
-import com.example.demo.utils.JWTService;
+import com.example.demo.utils.jwt.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 import java.util.List;
