@@ -52,8 +52,8 @@ public class CustomJsonLoginFilter extends CustomFilter {
             authenticationEntryPoint.commence(request, response, exception);
         });
         setAuthenticationSuccessHandler((request, response, authentication) -> {
-            String token = jwtService.createAccessToken((String)authentication.getPrincipal(), (List<String>)((CustomAuthentication)authentication).getRoles(), getIpFromRequest(request), getAgentFromRequest(request));
-            Cookie cookie = new Cookie(JWTService.ACCESS, token);
+            String token = jwtService.createRefreshToken((String)authentication.getPrincipal(), (List<String>)((CustomAuthentication)authentication).getRoles());
+            Cookie cookie = new Cookie(JWTService.REFRESH, token);
             cookie.setHttpOnly(false);
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60);  // 쿠키 유효시간 설정 (1시간)

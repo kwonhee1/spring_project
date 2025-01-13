@@ -19,8 +19,8 @@ import java.util.Arrays;
 
 public abstract class CustomTokenFilter extends CustomFilter {
 
-    private String tokenName;
-    private JWTService jwtService;
+    protected String tokenName;
+    protected JWTService jwtService;
 
     protected CustomTokenFilter(String tokenName, CustomRequestMatchers requestMatchers, JWTService jwtService) {
         super(requestMatchers);
@@ -29,6 +29,8 @@ public abstract class CustomTokenFilter extends CustomFilter {
 
         setAuthenticationManager(authentication -> {
             // 어떤 검증절차도 필요하지 않음 // 위에서 부르지 않을 예정
+            authentication.setAuthenticated(true);
+            System.out.println("access : "+ authentication.isAuthenticated());
             return authentication;
         });
     }
@@ -45,27 +47,14 @@ public abstract class CustomTokenFilter extends CustomFilter {
             authentication = attemptAuthentication((HttpServletRequest) request, (HttpServletResponse) response);
         } catch (Exception e) {
             e.printStackTrace();
-            failureHandler((HttpServletRequest) request, (HttpServletResponse) response, e);
-            return;
         }
         if (authentication == null) {
             failureHandler((HttpServletRequest) request, (HttpServletResponse) response, new CustomException(CustomTitle.NOT_FOUND, CustomMessage.NO_ACCESS_TOKEN));
         } else {
             successHandler((HttpServletRequest) request, (HttpServletResponse) response, authentication);
-            //successfulAuthentication() 에서 해당 authentication security context에 저장
-            chain.doFilter(request, response);
         }
-    }
-
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-        request.setCharacterEncoding("UTF-8");
-
-        String access_token = Arrays.stream(request.getCookies()).filter(c -> {
-            return c.getName().equals(tokenName);
-        }).findAny().get().getValue();
-
-        return jwtService.getAuthentication(access_token, getIpFromRequest(request), getAgentFromRequest(request));
+        // fail , success 둘다 일단 아음 filter로 넘어감
+        chain.doFilter(request, response);
     }
 
     protected abstract void successHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication);

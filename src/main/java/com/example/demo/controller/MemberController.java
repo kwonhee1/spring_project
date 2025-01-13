@@ -5,16 +5,15 @@ import com.example.demo.exception.http.view.CustomMessage;
 import com.example.demo.exception.reflection.NotExistMethodName;
 import com.example.demo.model.Member;
 import com.example.demo.service.MemberService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.catalina.User;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,10 +32,11 @@ public class MemberController {
 
     // UserPage
     @GetMapping(URIMappers.UserPageURI)
-    public String userPage(Model model) {
+    public String userPage(Model model, ServletRequest request, HttpServletResponse response) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
         System.out.println(authentication);
         model.addAttribute("email", authentication.getPrincipal());
+
         return URIMappers.UserPageHtml;
     }
 
