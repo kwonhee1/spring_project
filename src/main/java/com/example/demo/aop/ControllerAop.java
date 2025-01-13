@@ -22,7 +22,7 @@ public class ControllerAop {
         // Before 요청 uri="uri", 요청 인자=
 
         Object[] args = joinPoint.getArgs();
-        //메서드에 들어가는 매개변수들에 대한 배열
+        //메서드에 들어가는 매개변수들에 대한 배열  ㄹvvl
         for(Object obj : args) {
             if (obj != null)
                 builder.append("(").append(obj.getClass().getSimpleName()).append(":").append(obj).append("), ");

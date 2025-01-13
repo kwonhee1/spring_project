@@ -1,5 +1,6 @@
 package com.example.demo.config.security;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.demo.config.security.filters.CustomAccessTokenFilter;
 import com.example.demo.config.security.filters.CustomFilter;
 import com.example.demo.config.security.filters.CustomTokenFilter;
@@ -8,6 +9,7 @@ import com.example.demo.config.security.filters.CustomJsonLoginFilter;
 import com.example.demo.controller.URIMappers;
 import com.example.demo.service.MemberService;
 import com.example.demo.utils.jwt.JWTService;
+import com.example.demo.utils.jwt.ValidateFunctionInterface;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -102,7 +104,8 @@ public class SecurityConfig  {
         // login logout filter 추가
             // json 객체
         http.addFilterAfter(customJsonLoginFilter(), LogoutFilter.class);
-        http.addFilterBefore(customTokenFilter(), CustomJsonLoginFilter.class);
+        //http.addFilterBefore(customTokenFilter(), CustomJsonLoginFilter.class);
+        http.addFilterBefore(customAccessFilter(), CustomJsonLoginFilter.class);
         return http.build();
     }
 

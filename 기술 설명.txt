@@ -9,7 +9,7 @@ spring boot
 				실패 : refresh token 지우고 로그인 페이지로 redirect
 			2. access token filter (login page검사안함)
 				성공 : authentication을 가지고 다음 filter 진행( 사실상 security종료)
-				실패 : access token 지우고 현재 request 로 redirect
+				실패 : access token 지우기 (만약 접근 request의 주소가 hasRole이라면 -> 자동으로 접근 제한 절차에 들어갈꺼임)
 			3. login UserPassword filter
 				성공 : refresh token 발급(access발급은 보류), return 200; (front에서 이전페이지로 location 변경)
 				실패 : return 404, 원인 보내줌(front에서 처리)

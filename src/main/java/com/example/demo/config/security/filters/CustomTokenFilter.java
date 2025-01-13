@@ -26,6 +26,11 @@ public abstract class CustomTokenFilter extends CustomFilter {
         super(requestMatchers);
         this.tokenName = tokenName;
         this.jwtService = jwtService;
+
+        setAuthenticationManager(authentication -> {
+            // 어떤 검증절차도 필요하지 않음 // 위에서 부르지 않을 예정
+            return authentication;
+        });
     }
 
     @Override
