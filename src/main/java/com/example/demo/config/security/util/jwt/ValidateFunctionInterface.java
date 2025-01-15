@@ -1,4 +1,4 @@
-package com.example.demo.utils.jwt;
+package com.example.demo.config.security.util.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 

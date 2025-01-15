@@ -4,7 +4,7 @@ import com.example.demo.config.security.CustomRequestMatchers;
 import com.example.demo.config.security.authentication.CustomAuthentication;
 import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.model.Member;
-import com.example.demo.utils.jwt.JWTService;
+import com.example.demo.config.security.util.jwt.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +15,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 public class CustomJsonLoginFilter extends CustomFilter {
@@ -52,12 +53,12 @@ public class CustomJsonLoginFilter extends CustomFilter {
             authenticationEntryPoint.commence(request, response, exception);
         });
         setAuthenticationSuccessHandler((request, response, authentication) -> {
-            String token = jwtService.createRefreshToken((String)authentication.getPrincipal(), (List<String>)((CustomAuthentication)authentication).getRoles());
-            Cookie cookie = new Cookie(JWTService.REFRESH, token);
-            cookie.setHttpOnly(false);
-            cookie.setPath("/");
-            cookie.setMaxAge(60 * 60);  // 쿠키 유효시간 설정 (1시간)
-            response.addCookie(cookie);
+            HashMap<String , String> claims = new HashMap<>();
+            claims.put("email", (String)authentication.getPrincipal());
+
+            String token = jwtService.createToken(JWTService.REFRESH, claims, (List<String>)((CustomAuthentication)authentication).getRoles());
+
+            response.addCookie( createCookie(JWTService.REFRESH, token, JWTService.UNLIMITED_TIME) );
 
             response.setStatus(HttpServletResponse.SC_OK);
         });

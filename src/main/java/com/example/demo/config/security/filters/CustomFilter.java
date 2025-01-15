@@ -1,5 +1,6 @@
 package com.example.demo.config.security.filters;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -25,19 +26,15 @@ public abstract class CustomFilter extends AbstractAuthenticationProcessingFilte
         return request.getHeader("User-Agent");
     }
 
-    protected CustomFilter(String defaultFilterProcessesUrl) {
-        super(defaultFilterProcessesUrl);
-    }
-
     protected CustomFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
         super(requiresAuthenticationRequestMatcher);
     }
 
-    protected CustomFilter(String defaultFilterProcessesUrl, AuthenticationManager authenticationManager) {
-        super(defaultFilterProcessesUrl, authenticationManager);
-    }
-
-    protected CustomFilter(RequestMatcher requiresAuthenticationRequestMatcher, AuthenticationManager authenticationManager) {
-        super(requiresAuthenticationRequestMatcher, authenticationManager);
+    protected Cookie createCookie(String object, String value, int age){
+        Cookie cookie = new Cookie(object, value);
+        cookie.setHttpOnly(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(age);
+        return cookie;
     }
 }

@@ -4,17 +4,31 @@ spring boot
 		참고 자료 : https://ksh-coding.tistory.com/70
 		
 		filter
-			1. access token filter (login page검사안함)
+			1. access black list filter (모든 url, 모든 uri에 대하여 검사)
+				작동 : access token이 black list에 있는 지 검사함
+				black list에 없음 : 그냥 진행
+				black list에 있음 : access, refresh token 모두 만료 + 넘어가기
+			2. access token filter
 				성공 : security context에 authenticaion 저장
-				실패 : access token 지우기 + 넘어가기
-			2. refresh  token filter(authentication이 있는지 검사하고 있다면 건너뜀, user page만 검사)
+				실패 : 넘어가기 (access 안 지움 -> refresh 에서 같이 처리)
+			3. refresh  token filter(authentication이 있는지 검사하고 있다면 건너뜀)
 				refresh token 검증
 				성공 : access token 발급 + security context에 authentication저장
-				실패 : refresh token 지우고 + 넘어가기
-			3. login UserPassword filter
+				실패 : access, refresh token 지우고 + 넘어가기
+			4. login UserPassword filter
 				성공 : refresh token 발급(access발급은 보류), return 200; (front에서 이전페이지로 location 변경)
 				실패 : return 404, 원인 보내줌(front에서 처리)
-			4. logout filter (default filter not custom)
+			5. logout filter (default filter not custom)
 				아직 미정
-		
+
+black list filter 
+	ip : 접속 차단
+	token : access, refresh 만료
+register 생성하면서 db에 refresh, access token또한 같이 생성하여 저장 (refresh 발급)
+refresh를 들고오면 db접근하여 확인 후 access 발급 (무조건 db에 확인하는 걸로) (캐시 : session이랑 다를게 없음, 검증 안하는건 불가능)
+access 들고오면 그냥 통과
+	access 에서 문제 발생시 ip black list
+
+passwd변경시 token black list
+
 	aop

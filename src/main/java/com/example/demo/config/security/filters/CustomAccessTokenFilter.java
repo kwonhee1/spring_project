@@ -2,9 +2,10 @@ package com.example.demo.config.security.filters;
 
 
 import com.example.demo.config.security.CustomRequestMatchers;
-import com.example.demo.utils.jwt.JWTService;
+import com.example.demo.config.security.util.blacklist.BlackListService;
+import com.example.demo.config.security.util.jwt.JWTService;
+import com.example.demo.config.security.util.jwt.exception.ValidateFailException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -12,11 +13,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 public class CustomAccessTokenFilter extends CustomTokenFilter {
-
     public CustomAccessTokenFilter() {
         super(JWTService.ACCESS,
                 new CustomRequestMatchers(CustomRequestMatchers.TokenPattern, CustomRequestMatchers.ALL_METHOD),
@@ -28,9 +29,7 @@ public class CustomAccessTokenFilter extends CustomTokenFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         request.setCharacterEncoding("UTF-8");
 
-        String access_token = Arrays.stream(request.getCookies()).filter(c -> {
-            return c.getName().equals(tokenName);
-        }).findAny().get().getValue();
+        String access_token = getToken(request, JWTService.ACCESS);
 
         HashMap<String, String> jwtValidateMap = new HashMap<>();
         jwtValidateMap.put("ip", getIpFromRequest(request));
@@ -49,10 +48,14 @@ public class CustomAccessTokenFilter extends CustomTokenFilter {
 
     @Override
     protected void failureHandler(HttpServletRequest request, HttpServletResponse response, Exception e) {
-        Cookie cookie = new Cookie(JWTService.ACCESS, "");
-        cookie.setHttpOnly(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);  // cookie 만료
-        response.addCookie(cookie);
+        // access 만료 처리 안함 ->  refresh 에서 확인후 같이 처리
+
+        // access 에서 무조건 처리해야하는 exception은? JSTService :: validate fail exception
+        if(e instanceof ValidateFailException){
+            // 다른 사람의 도용으로 간주 해당 ip backlist에 올리고 모든 token 만료 처리
+            BlackListService.addBlackList(getIpFromRequest(request));
+
+            System.out.println("CustomAccessTokenFilter :: failureHandler :: access token validate fail " + e.getMessage() + " target ip : " + getIpFromRequest(request) +" is added to blackList");
+        }
     }
 }

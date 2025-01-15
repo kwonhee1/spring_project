@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.security.Principal;
 import java.util.Map;
 
 @Controller
@@ -33,9 +32,9 @@ public class MemberController {
     // UserPage
     @GetMapping(URIMappers.UserPageURI)
     public String userPage(Model model, ServletRequest request, HttpServletResponse response) {
-        CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication);
-        model.addAttribute("email", authentication.getPrincipal());
+        //CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        //System.out.println(authentication);
+        //model.addAttribute("email", authentication.getPrincipal());
 
         return URIMappers.UserPageHtml;
     }

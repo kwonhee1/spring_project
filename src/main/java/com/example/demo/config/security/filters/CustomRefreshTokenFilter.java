@@ -1,9 +1,8 @@
 package com.example.demo.config.security.filters;
 
 import com.example.demo.config.security.CustomRequestMatchers;
-import com.example.demo.config.security.SecurityConfig;
 import com.example.demo.config.security.authentication.CustomAuthentication;
-import com.example.demo.utils.jwt.JWTService;
+import com.example.demo.config.security.util.jwt.JWTService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -11,13 +10,13 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 //refresh token 검증
@@ -61,7 +60,12 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
     @Override
     protected void successHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // refresh 존재 => access 발급 + security context에 authenticaion저장
-        String token = jwtService.createAccessToken((String)authentication.getPrincipal(), (List<String>)((CustomAuthentication)authentication).getRoles(), getIpFromRequest(request), getAgentFromRequest(request));
+        HashMap<String, String> claims = new HashMap<>();
+        claims.put("email", (String)authentication.getPrincipal());
+        claims.put("ip", getIpFromRequest(request));
+        claims.put("agent", getAgentFromRequest(request));
+
+        String token = jwtService.createToken(JWTService.ACCESS, claims, (List<String>)((CustomAuthentication)authentication).getRoles());
         Cookie cookie = new Cookie(JWTService.ACCESS, token);
         cookie.setHttpOnly(false);
         cookie.setPath("/");
@@ -74,10 +78,10 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
     @Override
     protected void failureHandler(HttpServletRequest request, HttpServletResponse response, Exception e) {
         // refresh 이상함 or 존재 안함 => refresh 만료 (redirect 걸지 않음 차후 security에 의해 차당 과정 진입
-        Cookie cookie = new Cookie(JWTService.REFRESH, "");
-        cookie.setHttpOnly(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);  // cookie 만료
-        response.addCookie(cookie);
+
+        // refresh  만료
+        response.addCookie(createCookie(JWTService.REFRESH, "", 0));
+        // access 도 만료
+        response.addCookie(createCookie(JWTService.ACCESS, "", 0));
     }
 }

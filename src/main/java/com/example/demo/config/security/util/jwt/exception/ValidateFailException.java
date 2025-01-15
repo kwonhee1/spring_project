@@ -1,4 +1,4 @@
-package com.example.demo.utils.jwt.exception;
+package com.example.demo.config.security.util.jwt.exception;
 
 public class ValidateFailException extends RuntimeException {
     public ValidateFailException(String message) {

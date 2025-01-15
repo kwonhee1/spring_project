@@ -4,10 +4,9 @@ import com.example.demo.config.security.filters.*;
 import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.controller.URIMappers;
 import com.example.demo.service.MemberService;
-import com.example.demo.utils.jwt.JWTService;
+import com.example.demo.config.security.util.jwt.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -27,6 +24,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -98,9 +98,10 @@ public class SecurityConfig  {
                 ;
         // login logout filter 추가
             // json 객체
-        http.addFilterBefore(customJsonLoginFilter(), LogoutFilter.class); // 3번쨰
-        http.addFilterBefore(customRefreshFilter(), CustomJsonLoginFilter.class); // 2번째
-        http.addFilterBefore(customAccessFilter(), CustomRefreshTokenFilter.class); // 1번쨰
+        http.addFilterBefore(customJsonLoginFilter(), LogoutFilter.class); // 4번쨰
+        http.addFilterBefore(customRefreshFilter(), CustomJsonLoginFilter.class); // 3번째
+        http.addFilterBefore(customAccessFilter(), CustomRefreshTokenFilter.class); // 2번쨰
+        http.addFilterBefore(customBlackListFilter(), CustomAccessTokenFilter.class); // 1번쨰
         return http.build();
     }
 
@@ -139,4 +140,7 @@ public class SecurityConfig  {
     public CustomFilter customRefreshFilter() {
         return new CustomRefreshTokenFilter();
     }
+
+    @Bean
+    public CustomFilter customBlackListFilter(){return new CustomBlackListFilter();}
 }

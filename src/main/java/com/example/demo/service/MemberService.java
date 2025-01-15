@@ -5,7 +5,7 @@ import com.example.demo.exception.http.view.CustomTitle;
 import com.example.demo.exception.http.view.CustomMessage;
 import com.example.demo.model.Member;
 import com.example.demo.repository.MemberRepository;
-import com.example.demo.utils.EmailService;
+import com.example.demo.util.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

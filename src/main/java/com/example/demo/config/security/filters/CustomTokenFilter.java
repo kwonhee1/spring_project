@@ -4,15 +4,15 @@ import com.example.demo.config.security.CustomRequestMatchers;
 import com.example.demo.exception.http.CustomException;
 import com.example.demo.exception.http.view.CustomMessage;
 import com.example.demo.exception.http.view.CustomTitle;
-import com.example.demo.utils.jwt.JWTService;
+import com.example.demo.config.security.util.jwt.JWTService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -47,14 +47,20 @@ public abstract class CustomTokenFilter extends CustomFilter {
             authentication = attemptAuthentication((HttpServletRequest) request, (HttpServletResponse) response);
         } catch (Exception e) {
             e.printStackTrace();
+            failureHandler((HttpServletRequest) request, (HttpServletResponse) response, e);
+            chain.doFilter(request, response);
+            return;
         }
-        if (authentication == null) {
-            failureHandler((HttpServletRequest) request, (HttpServletResponse) response, new CustomException(CustomTitle.NOT_FOUND, CustomMessage.NO_ACCESS_TOKEN));
-        } else {
-            successHandler((HttpServletRequest) request, (HttpServletResponse) response, authentication);
-        }
+
+        successHandler((HttpServletRequest) request, (HttpServletResponse) response, authentication);
         // fail , success 둘다 일단 아음 filter로 넘어감
         chain.doFilter(request, response);
+    }
+
+    protected String getToken(HttpServletRequest request, String tokenName) {
+        return Arrays.stream(request.getCookies()).filter(c -> {
+            return c.getName().equals(tokenName);
+        }).findAny().get().getValue();
     }
 
     protected abstract void successHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication);

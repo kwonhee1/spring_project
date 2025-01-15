@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class CustomRequestMatchers implements RequestMatcher {
     public static final Pattern LoginPattern = Pattern.compile("^"+ URIMappers.LoginPageURI +"$");
-    public static final Pattern TokenPattern = Pattern.compile(String.format("^(?!(%s|%s)$).*", URIMappers.LoginPageURI, URIMappers.RegisterPageURI)); // Login과 완별일치기 return false (LoginPage는 허용임)
+    public static final Pattern TokenPattern = Pattern.compile("^.*$");
     public static final String[] ALL_METHOD = new String[]{"GET", "POST", "PUT", "DELETE", "OPTIONS"};
 
     private final Pattern pattern;
@@ -25,7 +25,6 @@ public class CustomRequestMatchers implements RequestMatcher {
     public boolean matches(HttpServletRequest request) {
         String uri = request.getRequestURI();
         String method = request.getMethod();
-        System.out.println("uri:" + uri + " method:" + method);
         return pattern.matcher(uri).matches() && Arrays.stream(this.method).anyMatch(method::equals);
     }
 }
