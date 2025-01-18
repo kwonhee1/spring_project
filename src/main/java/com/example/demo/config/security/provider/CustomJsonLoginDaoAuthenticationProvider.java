@@ -37,7 +37,7 @@ public class CustomJsonLoginDaoAuthenticationProvider extends DaoAuthenticationP
     // authentication에 이상이 있는지 확인함
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String email = (String) authentication.getPrincipal();
+        String email = ((CustomAuthentication)authentication).getEmail();
         String inputPasswd = (String) authentication.getCredentials();
 
         Member dbMember = (Member)getUserDetailsService().loadUserByUsername(email);
@@ -46,11 +46,11 @@ public class CustomJsonLoginDaoAuthenticationProvider extends DaoAuthenticationP
         if(!getPasswordEncoder().matches(inputPasswd, dbMember.getPasswd())) {
             throw new CustomException(CustomTitle.BAD_REQUEST, CustomMessage.PASSWD_NOT_CORRECT);
         }
-        System.out.println(dbMember.getRoles());
 
-        ((CustomAuthentication) authentication).setAuthenticated(true);
-        ((CustomAuthentication) authentication).setDetails(dbMember);
+        ((CustomAuthentication) authentication).setMemberId(dbMember.getId());
+        ((CustomAuthentication) authentication).setRefreshLevel(dbMember.getRefreshLevel());
         ((CustomAuthentication) authentication).setRoles(dbMember.getRoles());
+        ((CustomAuthentication) authentication).setAuthenticated(true);
 
         return authentication;
     }

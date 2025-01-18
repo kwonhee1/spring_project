@@ -13,10 +13,11 @@ public interface MemberRepository {
     // public boolean login(String email, String password);
 
     // get Member from db for security : security에서 login할 때 email passwd확인을 위한 db 조회
-    public Member getMemberByEmail(String email);
+    public Member getMemberByMemberId(int memberId);
 
     // register
-    public void addMember(@Param("member") Member member);
+    public int addMember(@Param("member") Member member);
+    public void addRefresh(int userId);
 
     // check Email
     public boolean isExistEmail(String email);

@@ -138,7 +138,7 @@ public class SecurityConfig  {
 
     @Bean
     public CustomFilter customRefreshFilter() {
-        return new CustomRefreshTokenFilter();
+        return new CustomRefreshTokenFilter(memberService);
     }
 
     @Bean

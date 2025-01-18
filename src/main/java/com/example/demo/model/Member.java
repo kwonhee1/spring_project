@@ -9,12 +9,14 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class Member extends MyModel implements UserDetails{
-    private String id;      // pk auto_increment
+    private int id;      // pk auto_increment
     private String email;   // varchar(35)
     private String passwd;  // not null
     private String name;
 
     private ArrayList<String> roles = new ArrayList<>();      // check role in("user", "admin") default "user"
+
+    private int refreshLevel;
 
     public static Map<String, Method> getters = new HashMap<>();
 
@@ -27,10 +29,10 @@ public class Member extends MyModel implements UserDetails{
         this.name = name;
         return this;
     }
-    public String getId() {
+    public int getId() {
         return id;
     }
-    public Member setId(String id) {
+    public Member setId(int id) {
         this.id = id;return this;
     }
     public String getPasswd() {
@@ -54,7 +56,12 @@ public class Member extends MyModel implements UserDetails{
     public Collection<String> getRoles() {
         return roles;
     }
-
+    public int getRefreshLevel() {
+        return refreshLevel;
+    }
+    public void setRefreshLevel(int refresh_level) {
+        this.refreshLevel = refresh_level;
+    }
     @Override
     public String toString() {
         return "Member{" +

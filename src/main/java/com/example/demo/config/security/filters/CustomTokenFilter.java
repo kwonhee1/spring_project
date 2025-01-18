@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 public abstract class CustomTokenFilter extends CustomFilter {
 
@@ -27,12 +28,7 @@ public abstract class CustomTokenFilter extends CustomFilter {
         this.tokenName = tokenName;
         this.jwtService = jwtService;
 
-        setAuthenticationManager(authentication -> {
-            // 어떤 검증절차도 필요하지 않음 // 위에서 부르지 않을 예정
-            authentication.setAuthenticated(true);
-            System.out.println("access : "+ authentication.isAuthenticated());
-            return authentication;
-        });
+        setAuthenticationManager(this::provider);
     }
 
     @Override
@@ -48,21 +44,28 @@ public abstract class CustomTokenFilter extends CustomFilter {
         } catch (Exception e) {
             e.printStackTrace();
             failureHandler((HttpServletRequest) request, (HttpServletResponse) response, e);
-            chain.doFilter(request, response);
+            //chain.doFilter(request, response);
             return;
         }
 
-        successHandler((HttpServletRequest) request, (HttpServletResponse) response, authentication);
-        // fail , success 둘다 일단 아음 filter로 넘어감
+        if(authentication != null) {
+            successHandler((HttpServletRequest) request, (HttpServletResponse) response, authentication);
+        }
         chain.doFilter(request, response);
     }
 
     protected String getToken(HttpServletRequest request, String tokenName) {
-        return Arrays.stream(request.getCookies()).filter(c -> {
+        Optional<Cookie> token = Arrays.stream(request.getCookies()).filter(c -> {
             return c.getName().equals(tokenName);
-        }).findAny().get().getValue();
+        }).findAny();
+
+        if(token.isEmpty()) {
+            return null;
+        }
+        return token.get().getValue();
     }
 
     protected abstract void successHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication);
-    protected abstract void failureHandler(HttpServletRequest request, HttpServletResponse response, Exception e);
+    protected abstract void failureHandler(HttpServletRequest request, HttpServletResponse response, Exception e) throws IOException;
+    protected abstract Authentication provider(Authentication authentication);
 }

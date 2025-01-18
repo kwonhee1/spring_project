@@ -3,14 +3,16 @@ spring boot
 		login form, session 사용 안함 (자체 token 발급)
 		참고 자료 : https://ksh-coding.tistory.com/70
 		
-		filter
+		filter : 실패시 무조건 중단?
 			1. access black list filter (모든 url, 모든 uri에 대하여 검사)
 				작동 : access token이 black list에 있는 지 검사함
-				black list에 없음 : 그냥 진행
-				black list에 있음 : access, refresh token 모두 만료 + 넘어가기
+				black list에 없음 : 그냥 진행 return null
+				black list에 있음 : access, refresh token 모두 만료 + 접속 차단(response header 작성)
 			2. access token filter
 				성공 : security context에 authenticaion 저장
 				실패 : 넘어가기 (access 안 지움 -> refresh 에서 같이 처리)
+
+					access token에 이상한값(복구화조차 되지 않는 값)인경우 black list에 넣을껀지...? (일단 invalidateTOkenException만 발생 상태)
 			3. refresh  token filter(authentication이 있는지 검사하고 있다면 건너뜀)
 				refresh token 검증
 				성공 : access token 발급 + security context에 authentication저장

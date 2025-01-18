@@ -23,20 +23,28 @@ public class CustomAccessTokenFilter extends CustomTokenFilter {
                 new CustomRequestMatchers(CustomRequestMatchers.TokenPattern, CustomRequestMatchers.ALL_METHOD),
                 new JWTService()
         );
+        setAuthenticationManager(authentication -> {
+            return authentication;
+            // 어떠한 일도 하지 않음 , token은 무조건 변조 불가로 가정
+        });
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-        request.setCharacterEncoding("UTF-8");
-
         String access_token = getToken(request, JWTService.ACCESS);
+
+        if(access_token == null){
+            // no token
+            return null;
+        }
 
         HashMap<String, String> jwtValidateMap = new HashMap<>();
         jwtValidateMap.put("ip", getIpFromRequest(request));
         jwtValidateMap.put("agent", getAgentFromRequest(request));
 
         Authentication authentication = jwtService.getAuthentication(access_token, jwtValidateMap);
-        return getAuthenticationManager().authenticate(authentication);
+
+        return authentication;
     }
 
     @Override

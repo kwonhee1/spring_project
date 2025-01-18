@@ -1,5 +1,6 @@
 package com.example.demo.config.security.authentication;
 
+import com.example.demo.model.Member;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,18 +10,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class CustomAuthentication implements Authentication {
-    private UserDetails member;
+    private int memberId;
     private Collection<String> roles;
     private String email;
     private String passwd;
     private boolean authenticated = false;
+    private int refreshLevel;
 
+    // json login filter :: input id and passwd
     public CustomAuthentication(String principal,String credential) {
         email = principal;
         passwd = credential;
     }
 
-    public CustomAuthentication(String principal,String credential, Collection<String> authorities) {
+    public CustomAuthentication(int id, String principal, String credential, Collection<String> authorities) {
+        memberId = id;
         email = principal;
         passwd = credential;
         roles = authorities;
@@ -32,6 +36,11 @@ public class CustomAuthentication implements Authentication {
         roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
         return authorities;
     }
+    public void setRefreshLevel(int refreshLevel) {this.refreshLevel = refreshLevel;}
+    public int getRefreshLevel() {return refreshLevel;}
+    public String getEmail() {return email;}
+    public void setEmail(String email) {this.email = email;}
+    public void setMemberId(int id) {memberId = id;}
     public void setRoles(Collection<String>roles) {
         this.roles = roles;
     }
@@ -47,24 +56,21 @@ public class CustomAuthentication implements Authentication {
     }
     @Override
     public Object getDetails() {
-        return member;
-    }
-    public void setDetails(UserDetails member) {
-        this.member = member;
+        return null;
     }
     @Override
     public Object getPrincipal() {
-        return email;
-    }
-    public void setPrincipal(String email) {
-        this.email = email;
+        return memberId;
     }
     @Override
     public boolean isAuthenticated() {
         return authenticated;
     }
     @Override
-    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+    public void setAuthenticated(boolean isAuthenticated) {
+        if(email == null || memberId == 0 || roles == null)
+            throw new AuthenticationFailException("CustomAuthentication >> setAuthenticated :: left null value");
+
         authenticated = isAuthenticated;
         removeCredentials();
     }
@@ -84,7 +90,6 @@ public class CustomAuthentication implements Authentication {
     @Override
     public String toString() {
         return "CustomAuthentication{" +
-                "member=" + member +
                 ", roles=" + roles +
                 ", email='" + email + '\'' +
                 ", passwd='" + passwd + '\'' +

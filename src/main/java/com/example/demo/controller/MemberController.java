@@ -32,9 +32,9 @@ public class MemberController {
     // UserPage
     @GetMapping(URIMappers.UserPageURI)
     public String userPage(Model model, ServletRequest request, HttpServletResponse response) {
-        //CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        //System.out.println(authentication);
-        //model.addAttribute("email", authentication.getPrincipal());
+        CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication);
+        model.addAttribute("email", authentication.getEmail());
 
         return URIMappers.UserPageHtml;
     }

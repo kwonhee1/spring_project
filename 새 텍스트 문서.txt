@@ -1,0 +1,20 @@
+Member extends MyModel implememts UserDetails
+	id, email, passwd, name, roles, refreshLevel
+	getters
+
+CustomAuthenticaion extends Autheticaion
+	UserDetails member
+	roles, email, passwd, bool authenticated 
+
+
+JsonLoginFilter 
+	CustomAuthentic(input email,passwd) -> email,passwd check(from db) -> add others(roles, memberId, refreshLevel from db) + authenticated -> save security context
+
+refreshTokenFilter
+	refreshtoken -> CustomAuthentication(id, level) -> check level(from db) + get DB Member -> public AccessToken -> save securtiy context
+
+access Token Filter
+	accessToken -> CustomAuthentication(id, email, roles) (set authenticated) -> save security context
+
+custom refresh toeken filter authenticaion manager (provider) 작업중, 위에 내용 작업 완료
+

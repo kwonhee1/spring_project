@@ -1,8 +1,11 @@
 package com.example.demo.config.security.filters;
 
 import com.example.demo.config.security.CustomRequestMatchers;
+import com.example.demo.config.security.authentication.AuthenticationFailException;
 import com.example.demo.config.security.authentication.CustomAuthentication;
 import com.example.demo.config.security.util.jwt.JWTService;
+import com.example.demo.model.Member;
+import com.example.demo.service.MemberService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -15,8 +18,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 //refresh token 검증
@@ -24,12 +25,17 @@ import java.util.List;
 //				실패 : refresh token 지우고 로그인 페이지로 redirect
 public class CustomRefreshTokenFilter extends CustomTokenFilter{
     protected Authentication authentication;
+    private MemberService memberService;
 
-    public CustomRefreshTokenFilter() {
+    public CustomRefreshTokenFilter(MemberService memberService) {
         super(
                 JWTService.REFRESH,
                 new CustomRequestMatchers(CustomRequestMatchers.TokenPattern, CustomRequestMatchers.ALL_METHOD),
                 new JWTService());
+
+        // data base에서 refresh token의 level 값을 확인함
+        this.memberService = memberService;
+        setAuthenticationManager(this::authenticationManager);
     }
 
     @Override
@@ -47,11 +53,12 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         // authentication 없음 (access 없음) => refresh 얻기
+        String refresh = getToken(request, JWTService.REFRESH);
 
-        request.setCharacterEncoding("UTF-8");
-        String refresh = Arrays.stream(request.getCookies()).filter(c -> {
-            return c.getName().equals(tokenName);
-        }).findAny().get().getValue();
+        if(refresh == null){
+            // no token
+            return null;
+        }
 
         authentication = jwtService.getAuthentication(refresh, null);
         return getAuthenticationManager().authenticate(authentication);
@@ -60,12 +67,14 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
     @Override
     protected void successHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // refresh 존재 => access 발급 + security context에 authenticaion저장
-        HashMap<String, String> claims = new HashMap<>();
-        claims.put("email", (String)authentication.getPrincipal());
-        claims.put("ip", getIpFromRequest(request));
-        claims.put("agent", getAgentFromRequest(request));
-
-        String token = jwtService.createToken(JWTService.ACCESS, claims, (List<String>)((CustomAuthentication)authentication).getRoles());
+        String token =
+                jwtService.createToken(JWTService.ACCESS, (int)authentication.getPrincipal())
+                        .claim("email", ((CustomAuthentication) authentication).getEmail())
+                        .claim("ip", getIpFromRequest(request))
+                        .claim("agent", getAgentFromRequest(request))
+                        .claim("authorities", (List<String>) ((CustomAuthentication)authentication).getRoles() )
+                        .expiresAt(JWTService.ACCESS_TIME)
+                        .build();
         Cookie cookie = new Cookie(JWTService.ACCESS, token);
         cookie.setHttpOnly(false);
         cookie.setPath("/");
@@ -83,5 +92,23 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
         response.addCookie(createCookie(JWTService.REFRESH, "", 0));
         // access 도 만료
         response.addCookie(createCookie(JWTService.ACCESS, "", 0));
+    }
+    
+    public Authentication authenticationManager(Authentication authentication) throws AuthenticationException {
+        // db에서 authenticaion가져옴
+        Member DBMember = memberService.getMemberByMemberId((int)authentication.getPrincipal());
+
+        // db에 있는 level과 refresh token의 level을 비교하는 과정 필요 -> failure Handler 실행을 위한 exception 발생
+        if(!memberService.checkRefreshLevel( (int) ((CustomAuthentication)authentication).getPrincipal(),
+                                            ((CustomAuthentication) authentication).getRefreshLevel()))
+            throw new AuthenticationFailException("by refresh level : CustomRefreshTokenFilter >> authenticationManager");
+
+        // authentication에 필요한 정보 추가
+        ((CustomAuthentication) authentication).setEmail(DBMember.getEmail());
+        ((CustomAuthentication) authentication).setRoles(DBMember.getRoles());
+
+        authentication.setAuthenticated(true);
+
+        return authentication;
     }
 }

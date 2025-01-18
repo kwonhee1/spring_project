@@ -23,12 +23,8 @@ public class MemberService {
         this.passwordEncoder = passwordEncoder;
     }
 
-//    public boolean login(String email, String passwd){
-//        return memberRepository.login(email, passwd);
-//    }
-
-    public Member getMemberByEmail(String email){
-        Member member = memberRepository.getMemberByEmail(email);
+    public Member getMemberByMemberId(int memberId){
+        Member member = memberRepository.getMemberByMemberId(memberId);
         if(member == null)
             throw new CustomException(CustomTitle.NOT_FOUND, CustomMessage.NO_EXIST_EMAIL);
         System.out.println("service:"+ member.getAuthorities());
@@ -46,7 +42,8 @@ public class MemberService {
         // encode passwd
         member.setPasswd(passwordEncoder.encode(member.getPasswd()));
         // add member to db
-        memberRepository.addMember(member);
+        int userId = memberRepository.addMember(member);
+        memberRepository.addRefresh(userId);
     }
 
     public void sendEmail(String email){
@@ -55,6 +52,10 @@ public class MemberService {
 
         //send email
         emailService.sendEmial(email);
+    }
+
+    public boolean checkRefreshLevel(int memberId, int inputLevel){
+       return memberRepository.getRefreshLevel(memberId);
     }
 
     private void validateNotExistEmail(String email){

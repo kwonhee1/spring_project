@@ -3,6 +3,7 @@ package com.example.demo.config.security.filters;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -37,4 +38,6 @@ public abstract class CustomFilter extends AbstractAuthenticationProcessingFilte
         cookie.setMaxAge(age);
         return cookie;
     }
+
+    protected abstract Authentication provider(Authentication authentication);
 }

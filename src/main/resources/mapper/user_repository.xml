@@ -7,13 +7,18 @@
 <!--        select if (count(*) = 1,TRUE,FALSE) from member where email = #{email} and passwd = #{passwd};-->
 <!--    </insert>-->
 
-    <select id="getMemberByEmail" resultType="com.example.demo.model.Member">
-        select * from member where email = #{email};
+    <select id="getMemberByMemberId" resultType="com.example.demo.model.Member">
+        select * from memberView where id = #{memberId};
     </select>
 
-    <insert id="addMember">
+    <insert id="addMember" useGeneratedKeys="true" keyColumn="id">
         INSERT INTO member(email, passwd, name)
         VALUES (#{member.email}, #{member.passwd}, #{member.name});
+    </insert>
+
+    <insert id="addRefresh">
+        INSERT INTO refresh(user_id)
+        VALUES (#{userId});
     </insert>
 
     <select id="isExistEmail">
