@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.config.security.authentication.AuthenticationFailException;
 import com.example.demo.exception.http.CustomException;
 import com.example.demo.exception.http.view.CustomTitle;
 import com.example.demo.exception.http.view.CustomMessage;
@@ -21,6 +22,18 @@ public class MemberService {
         this.emailService = emailService;
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public Member login(String email, String inputPassword){
+        Member dbMember = memberRepository.getMemberByEmail(email);
+
+        if(dbMember == null)
+            throw new CustomException(CustomTitle.NOT_FOUND, CustomMessage.NO_EXIST_EMAIL);
+
+        if(!passwordEncoder.matches(inputPassword, dbMember.getPasswd()))
+            throw new CustomException(CustomTitle.BAD_REQUEST, CustomMessage.PASSWD_NOT_CORRECT);
+
+        return dbMember;
     }
 
     public Member getMemberByMemberId(int memberId){

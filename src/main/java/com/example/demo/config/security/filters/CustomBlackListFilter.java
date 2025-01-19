@@ -50,4 +50,8 @@ public class CustomBlackListFilter extends CustomTokenFilter{
 
         return null;
     }
+    @Override
+    protected Authentication provider(Authentication authentication) {
+        return null;
+    }
 }

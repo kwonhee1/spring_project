@@ -14,6 +14,7 @@ public interface MemberRepository {
 
     // get Member from db for security : security에서 login할 때 email passwd확인을 위한 db 조회
     public Member getMemberByMemberId(int memberId);
+    public Member getMemberByMemberEmail(String email);
 
     // register
     public int addMember(@Param("member") Member member);

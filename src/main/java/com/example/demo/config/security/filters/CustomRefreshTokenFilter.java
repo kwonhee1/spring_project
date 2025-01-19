@@ -35,7 +35,6 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
 
         // data base에서 refresh token의 level 값을 확인함
         this.memberService = memberService;
-        setAuthenticationManager(this::authenticationManager);
     }
 
     @Override
@@ -93,14 +92,15 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
         // access 도 만료
         response.addCookie(createCookie(JWTService.ACCESS, "", 0));
     }
-    
-    public Authentication authenticationManager(Authentication authentication) throws AuthenticationException {
+
+    @Override
+    protected Authentication provider(Authentication authentication) {
         // db에서 authenticaion가져옴
         Member DBMember = memberService.getMemberByMemberId((int)authentication.getPrincipal());
 
         // db에 있는 level과 refresh token의 level을 비교하는 과정 필요 -> failure Handler 실행을 위한 exception 발생
         if(!memberService.checkRefreshLevel( (int) ((CustomAuthentication)authentication).getPrincipal(),
-                                            ((CustomAuthentication) authentication).getRefreshLevel()))
+                ((CustomAuthentication) authentication).getRefreshLevel()))
             throw new AuthenticationFailException("by refresh level : CustomRefreshTokenFilter >> authenticationManager");
 
         // authentication에 필요한 정보 추가

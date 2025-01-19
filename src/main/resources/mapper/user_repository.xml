@@ -11,6 +11,10 @@
         select * from memberView where id = #{memberId};
     </select>
 
+    <select id="getMemberByMemberEmail" resultType="com.example.demo.model.Member">
+        select * from memberView where email = #{email};
+    </select>
+
     <insert id="addMember" useGeneratedKeys="true" keyColumn="id">
         INSERT INTO member(email, passwd, name)
         VALUES (#{member.email}, #{member.passwd}, #{member.name});

@@ -66,4 +66,10 @@ public class CustomAccessTokenFilter extends CustomTokenFilter {
             System.out.println("CustomAccessTokenFilter :: failureHandler :: access token validate fail " + e.getMessage() + " target ip : " + getIpFromRequest(request) +" is added to blackList");
         }
     }
+
+    @Override
+    protected Authentication provider(Authentication authentication) {
+        // 아무 검증 절차도 진행하지 않음
+        return authentication;
+    }
 }
