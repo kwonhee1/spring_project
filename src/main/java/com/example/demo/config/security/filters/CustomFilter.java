@@ -8,6 +8,10 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 public abstract class CustomFilter extends AbstractAuthenticationProcessingFilter {
+    protected CustomFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
+        super(requiresAuthenticationRequestMatcher);
+        setAuthenticationManager((authentic)->{return null;});
+    }
 
     protected String getIpFromRequest(HttpServletRequest request) {
         String ipAddress = request.getHeader("X-Forwarded-For");
@@ -25,10 +29,6 @@ public abstract class CustomFilter extends AbstractAuthenticationProcessingFilte
 
     protected String getAgentFromRequest(HttpServletRequest request) {
         return request.getHeader("User-Agent");
-    }
-
-    protected CustomFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
-        super(requiresAuthenticationRequestMatcher);
     }
 
     protected Cookie createCookie(String object, String value, int age){

@@ -16,6 +16,9 @@ public interface MemberRepository {
     public Member getMemberByMemberId(int memberId);
     public Member getMemberByMemberEmail(String email);
 
+    // get Member Refersh Level for check RefreshToken
+    public int getRefreshLevel(int id);
+
     // register
     public int addMember(@Param("member") Member member);
     public void addRefresh(int userId);

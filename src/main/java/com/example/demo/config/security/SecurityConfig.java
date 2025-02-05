@@ -1,7 +1,6 @@
 package com.example.demo.config.security;
 
 import com.example.demo.config.security.filters.*;
-import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
 import com.example.demo.controller.URIMappers;
 import com.example.demo.service.MemberService;
 import com.example.demo.config.security.util.jwt.JWTService;
@@ -24,9 +23,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -105,14 +101,10 @@ public class SecurityConfig  {
         return http.build();
     }
 
-    // filter / provider
-    @Bean
-    public CustomJsonLoginDaoAuthenticationProvider daoAuthenticationProvider() {
-        return new CustomJsonLoginDaoAuthenticationProvider(memberService, passwordEncoder).getLoginDaoAuthenticationProvider();
-    }
+    // filter
     @Bean
     public CustomJsonLoginFilter customJsonLoginFilter() {
-        return new CustomJsonLoginFilter(daoAuthenticationProvider(), objectMapper, authenticationEntryPoint(), jwtService);
+        return new CustomJsonLoginFilter(objectMapper, authenticationEntryPoint(), jwtService);
     }
 //    @Bean
 //    public CustomAccessTokenFilter customTokenFilter(){

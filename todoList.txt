@@ -1,23 +1,13 @@
+2. https : http ssl 인증서 만들기 + 해당 보안 정책 공부하기 (cookie 보안 정책들 공부)
+3. jwtService에 refresh, access token model객체화 하기
+4. aop 공부하기
+5. 트렌직션 공부하기
+6. test code 작성하기 + 작성법 코드로 남기기
 
-1. 어노테이션 공부하기 : ok
-3. security공부 : 개발 중 !!! -> token 도입
-	securityContextHolder에 Authentication저장 막기
-	access token cookie위에 올리기
-	token filter 
-4. aop 공부하기 ok
+------------------------ 1월 안으로 위 5개 완료하기 ------------------------------------
+8.
 
-소셜로그인 : 나중에
-
-Exception 사용법 정리하고 기록하기
-
-test code 작성하기 + 작성법 코드로 남기기
-
-6. 트렌직션 공부하기
 7. undo 기능 구현
 
 8. 프로젝트 db설계하기
 9. mybatis 다른 함수 어노테이션들 공부하기 (두개이상의 인자 넘기기, 반환값 확인하기, 성공여부 반환 방법 등..)
-
-//customAuthentication 만들었음 filter 에서 예전꺼에서 세로우널로 변경작업하면서 생성자 만들기
-2. Permission 제거, MemberRole변경
-	Member : String으로 저장 -> filter에서 Authentication : String 저장 -> set is authentic true 함수에서 Collection<GrantedAuthentic>을 생성하고 get athorities() 할때마다 반환 하는 걸로

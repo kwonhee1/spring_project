@@ -25,7 +25,7 @@ public class MemberService {
     }
 
     public Member login(String email, String inputPassword){
-        Member dbMember = memberRepository.getMemberByEmail(email);
+        Member dbMember = memberRepository.getMemberByMemberEmail(email);
 
         if(dbMember == null)
             throw new CustomException(CustomTitle.NOT_FOUND, CustomMessage.NO_EXIST_EMAIL);
@@ -68,7 +68,7 @@ public class MemberService {
     }
 
     public boolean checkRefreshLevel(int memberId, int inputLevel){
-       return memberRepository.getRefreshLevel(memberId);
+       return memberRepository.getRefreshLevel(memberId) == inputLevel;
     }
 
     private void validateNotExistEmail(String email){

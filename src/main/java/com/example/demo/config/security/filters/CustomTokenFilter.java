@@ -41,6 +41,9 @@ public abstract class CustomTokenFilter extends CustomFilter {
         Authentication authentication = null; // 이전에 authentication객체를 생성하는 어떠한 filter도 존재하지 않음
         try {
             authentication = attemptAuthentication((HttpServletRequest) request, (HttpServletResponse) response);
+        }
+        catch(NoTokenException e){
+
         } catch (Exception e) {
             e.printStackTrace();
             failureHandler((HttpServletRequest) request, (HttpServletResponse) response, e);
@@ -55,13 +58,16 @@ public abstract class CustomTokenFilter extends CustomFilter {
     }
 
     protected String getToken(HttpServletRequest request, String tokenName) {
+        if(request.getCookies() == null)
+            throw new NoTokenException(tokenName);
+
         Optional<Cookie> token = Arrays.stream(request.getCookies()).filter(c -> {
             return c.getName().equals(tokenName);
         }).findAny();
 
-        if(token.isEmpty()) {
-            return null;
-        }
+        if(token.isEmpty())
+            throw new NoTokenException(tokenName);
+
         return token.get().getValue();
     }
 

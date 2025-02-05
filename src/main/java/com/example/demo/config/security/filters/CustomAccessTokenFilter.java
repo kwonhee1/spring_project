@@ -13,9 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 public class CustomAccessTokenFilter extends CustomTokenFilter {
     public CustomAccessTokenFilter() {
@@ -32,11 +30,6 @@ public class CustomAccessTokenFilter extends CustomTokenFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         String access_token = getToken(request, JWTService.ACCESS);
-
-        if(access_token == null){
-            // no token
-            return null;
-        }
 
         HashMap<String, String> jwtValidateMap = new HashMap<>();
         jwtValidateMap.put("ip", getIpFromRequest(request));

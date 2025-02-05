@@ -10,9 +10,12 @@
     <select id="getMemberByMemberId" resultType="com.example.demo.model.Member">
         select * from memberView where id = #{memberId};
     </select>
-
     <select id="getMemberByMemberEmail" resultType="com.example.demo.model.Member">
         select * from memberView where email = #{email};
+    </select>
+
+    <select id="getRefreshLevel" resultType="Integer">
+        select refresh_level from refresh where user_id = #{id};
     </select>
 
     <insert id="addMember" useGeneratedKeys="true" keyColumn="id">

@@ -2,17 +2,12 @@ package com.example.demo.config.security.filters;
 
 import com.example.demo.config.security.CustomRequestMatchers;
 import com.example.demo.config.security.authentication.CustomAuthentication;
-import com.example.demo.config.security.provider.CustomJsonLoginDaoAuthenticationProvider;
-import com.example.demo.exception.http.CustomException;
-import com.example.demo.exception.http.view.CustomMessage;
-import com.example.demo.exception.http.view.CustomTitle;
 import com.example.demo.model.Member;
 import com.example.demo.config.security.util.jwt.JWTService;
 import com.example.demo.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
