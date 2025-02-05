@@ -8,6 +8,15 @@
 8.
 
 7. undo 기능 구현
+8. spring batch 공부하기
 
 8. 프로젝트 db설계하기
+<<<<<<< HEAD
 9. mybatis 다른 함수 어노테이션들 공부하기 (두개이상의 인자 넘기기, 반환값 확인하기, 성공여부 반환 방법 등..)
+=======
+9. mybatis 다른 함수 어노테이션들 공부하기 (두개이상의 인자 넘기기, 반환값 확인하기, 성공여부 반환 방법 등..)
+
+//customAuthentication 만들었음 filter 에서 예전꺼에서 세로우널로 변경작업하면서 생성자 만들기
+2. Permission 제거, MemberRole변경
+	Member : String으로 저장 -> filter에서 Authentication : String 저장 -> set is authentic true 함수에서 Collection<GrantedAuthentic>을 생성하고 get athorities() 할때마다 반환 하는 걸로
+>>>>>>> e70269d792c5296349b8ddd1a61f2ff858e9b765
