@@ -1,10 +1,10 @@
 package com.example.demo.config.security.filters;
 
 import com.example.demo.config.security.CustomRequestMatchers;
-import com.example.demo.config.security.authentication.CustomAuthentication;
 import com.example.demo.config.security.util.blacklist.BlackListException;
 import com.example.demo.config.security.util.blacklist.BlackListService;
-import com.example.demo.config.security.util.jwt.JWTService;
+import com.example.demo.config.security.util.jwt.model.AccessToken;
+import com.example.demo.config.security.util.jwt.model.RefreshToken;
 import com.example.demo.controller.URIMappers;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,9 +18,8 @@ public class CustomBlackListFilter extends CustomTokenFilter{
     private final BlackListService blackListService;
 
     public CustomBlackListFilter() {
-        super(JWTService.ACCESS,
-                new CustomRequestMatchers(CustomRequestMatchers.TokenPattern, CustomRequestMatchers.ALL_METHOD),
-                null);
+        super(AccessToken.ACCESS,
+                new CustomRequestMatchers(CustomRequestMatchers.TokenPattern, CustomRequestMatchers.ALL_METHOD));
         setAuthenticationManager(authentication -> authentication);
         blackListService = new BlackListService();
     }
@@ -34,8 +33,8 @@ public class CustomBlackListFilter extends CustomTokenFilter{
     protected void failureHandler(HttpServletRequest request, HttpServletResponse response, Exception e) throws IOException {
         if (e instanceof BlackListException) {
             // access, refresh token 날림
-            response.addCookie(createCookie(JWTService.REFRESH, "", 0));
-            response.addCookie(createCookie(JWTService.ACCESS, "", 0));
+            response.addCookie(createCookie(RefreshToken.REFRESH, "", 0));
+            response.addCookie(createCookie(AccessToken.ACCESS, "", 0));
 
             response.sendRedirect(URIMappers.MainPageURI);
         }
@@ -43,10 +42,8 @@ public class CustomBlackListFilter extends CustomTokenFilter{
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-        request.setCharacterEncoding("UTF-8");
-
-        BlackListService.checkIP(getIpFromRequest(request));
-        BlackListService.checkToken(getToken(request, JWTService.ACCESS));
+        BlackListService.checkIP((String)request.getAttribute("ip"));
+        BlackListService.checkToken((String)request.getAttribute(AccessToken.ACCESS));
 
         return null;
     }

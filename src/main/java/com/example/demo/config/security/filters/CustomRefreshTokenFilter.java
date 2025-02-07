@@ -3,7 +3,8 @@ package com.example.demo.config.security.filters;
 import com.example.demo.config.security.CustomRequestMatchers;
 import com.example.demo.config.security.authentication.AuthenticationFailException;
 import com.example.demo.config.security.authentication.CustomAuthentication;
-import com.example.demo.config.security.util.jwt.JWTService;
+import com.example.demo.config.security.util.jwt.model.AccessToken;
+import com.example.demo.config.security.util.jwt.model.RefreshToken;
 import com.example.demo.model.Member;
 import com.example.demo.service.MemberService;
 import jakarta.servlet.FilterChain;
@@ -29,9 +30,8 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
 
     public CustomRefreshTokenFilter(MemberService memberService) {
         super(
-                JWTService.REFRESH,
-                new CustomRequestMatchers(CustomRequestMatchers.TokenPattern, CustomRequestMatchers.ALL_METHOD),
-                new JWTService());
+                RefreshToken.REFRESH,
+                new CustomRequestMatchers(CustomRequestMatchers.TokenPattern, CustomRequestMatchers.ALL_METHOD));
 
         // data base에서 refresh token의 level 값을 확인함
         this.memberService = memberService;
@@ -52,33 +52,21 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         // authentication 없음 (access 없음) => refresh 얻기
-        String refresh = getToken(request, JWTService.REFRESH);
+        String refresh = (String)request.getAttribute(RefreshToken.REFRESH);
 
-        if(refresh == null){
-            // no token
+        if(refresh == null || refresh.isEmpty()){
             return null;
         }
 
-        authentication = jwtService.getAuthentication(refresh, null);
-        return getAuthenticationManager().authenticate(authentication);
+        return getAuthenticationManager().authenticate(new RefreshToken().decode(refresh));
     }
 
     @Override
     protected void successHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // refresh 존재 => access 발급 + security context에 authenticaion저장
         String token =
-                jwtService.createToken(JWTService.ACCESS, (int)authentication.getPrincipal())
-                        .claim("email", ((CustomAuthentication) authentication).getEmail())
-                        .claim("ip", getIpFromRequest(request))
-                        .claim("agent", getAgentFromRequest(request))
-                        .claim("authorities", (List<String>) ((CustomAuthentication)authentication).getRoles() )
-                        .expiresAt(JWTService.ACCESS_TIME)
-                        .build();
-        Cookie cookie = new Cookie(JWTService.ACCESS, token);
-        cookie.setHttpOnly(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60);  // 쿠키 유효시간 설정 (1시간)
-        response.addCookie(cookie);
+                new RefreshToken((CustomAuthentication) authentication).toString();
+        response.addCookie(createCookie(AccessToken.ACCESS, token, AccessToken.ACCESS_TIME));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
@@ -88,9 +76,9 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
         // refresh 이상함 or 존재 안함 => refresh 만료 (redirect 걸지 않음 차후 security에 의해 차당 과정 진입
 
         // refresh  만료
-        response.addCookie(createCookie(JWTService.REFRESH, "", 0));
+        response.addCookie(createCookie(RefreshToken.REFRESH, "", 0));
         // access 도 만료
-        response.addCookie(createCookie(JWTService.ACCESS, "", 0));
+        response.addCookie(createCookie(AccessToken.ACCESS, "", 0));
     }
 
     @Override

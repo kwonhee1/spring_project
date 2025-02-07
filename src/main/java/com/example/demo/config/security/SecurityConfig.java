@@ -3,13 +3,13 @@ package com.example.demo.config.security;
 import com.example.demo.config.security.filters.*;
 import com.example.demo.controller.URIMappers;
 import com.example.demo.service.MemberService;
-import com.example.demo.config.security.util.jwt.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.web.configurers.SessionMan
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -31,15 +32,13 @@ public class SecurityConfig  {
     private MemberService memberService;
     private ObjectMapper objectMapper;
     private HandlerExceptionResolver handlerExceptionResolver;
-    private JWTService jwtService;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-     public SecurityConfig(ObjectMapper objectMapper, MemberService memberService,@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver, JWTService jwtService, PasswordEncoder passwordEncoder) {
+     public SecurityConfig(ObjectMapper objectMapper, MemberService memberService,@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver, PasswordEncoder passwordEncoder) {
          this.memberService = memberService;
          this.objectMapper = objectMapper;
          this.handlerExceptionResolver = resolver;
-         this.jwtService = jwtService;
          this.passwordEncoder = passwordEncoder;
      }
 
@@ -98,31 +97,15 @@ public class SecurityConfig  {
         http.addFilterBefore(customRefreshFilter(), CustomJsonLoginFilter.class); // 3번째
         http.addFilterBefore(customAccessFilter(), CustomRefreshTokenFilter.class); // 2번쨰
         http.addFilterBefore(customBlackListFilter(), CustomAccessTokenFilter.class); // 1번쨰
+        http.addFilterBefore(firstFilter(), CustomBlackListFilter.class); // 0번째
         return http.build();
     }
 
     // filter
     @Bean
     public CustomJsonLoginFilter customJsonLoginFilter() {
-        return new CustomJsonLoginFilter(objectMapper, authenticationEntryPoint(), jwtService);
+        return new CustomJsonLoginFilter(objectMapper, authenticationEntryPoint(), memberService);
     }
-//    @Bean
-//    public CustomAccessTokenFilter customTokenFilter(){
-//        return new CustomAccessTokenFilter( jwtService);
-//    }
-
-    // entry point :: filter Handler에서 exception반환시 security밖으로 빼주는 역할 -> controller로 전송
-
-    @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
-        return new AuthenticationEntryPoint(){
-            @Override
-            public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-                handlerExceptionResolver.resolveException(request, response, null, authException);
-            }
-        };
-    }
-
     @Bean
     public CustomFilter customAccessFilter() {
         return new CustomAccessTokenFilter();
@@ -135,4 +118,19 @@ public class SecurityConfig  {
 
     @Bean
     public CustomFilter customBlackListFilter(){return new CustomBlackListFilter();}
+
+    @Bean
+    public AbstractAuthenticationProcessingFilter firstFilter(){
+        return new FirstFilter();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new AuthenticationEntryPoint(){
+            @Override
+            public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+                handlerExceptionResolver.resolveException(request, response, null, authException);
+            }
+        };
+    }
 }

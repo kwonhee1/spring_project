@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.boot.SpringApplication;
@@ -32,10 +33,16 @@ public class DemoApplication {
 		};
 
 		// Add HTTP to HTTPS redirect
-		// tomcat.addAdditionalTomcatConnectors(httpToHttpsRedirectConnector());
-		// send HTTP to HTTPS : no send to https
+		tomcat.addAdditionalTomcatConnectors(createHttpConnector());
 
 		return tomcat;
 	}
-
+	private Connector createHttpConnector() {
+		Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+		connector.setScheme("http");
+		connector.setPort(8081);  // HTTP 요청을 받을 포트
+		connector.setSecure(false);
+		connector.setRedirectPort(8443);  // HTTPS 포트로 리디렉트
+		return connector;
+	}
 }

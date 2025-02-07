@@ -4,7 +4,7 @@ import com.example.demo.role.MemberRole;
 
 public class URIMappers {
     public static final String MainPageURI ="/MainPage";
-    public static final String MainPageHtml ="/MainController/MainPage.html";
+    public static final String MainPageHtml ="/MainPage/MainPage.html";
 
     public static final String LoginPageURI ="/Login";
     public static final String LoginPageHtml ="/MemberController/LoginPage.html";

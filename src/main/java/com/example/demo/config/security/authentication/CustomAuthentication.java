@@ -23,11 +23,16 @@ public class CustomAuthentication implements Authentication {
         passwd = credential;
     }
 
-    public CustomAuthentication(int id, String principal, String credential, Collection<String> authorities) {
+    // use AccessToken(String) to Authentic
+    public CustomAuthentication(int id, String principal, Collection<String> authorities) {
         memberId = id;
         email = principal;
-        passwd = credential;
         roles = authorities;
+    }
+    // use RefreshToken(String) to Authentic
+    public CustomAuthentication(int id, int level) {
+        memberId = id;
+        refreshLevel = level;
     }
 
     @Override
