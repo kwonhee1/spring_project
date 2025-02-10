@@ -23,6 +23,8 @@ public class CustomAccessTokenFilter extends CustomTokenFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        System.out.println("access filter");
+
         String access_token = (String)request.getAttribute(AccessToken.ACCESS);
         if(access_token == null || access_token.isEmpty()){
             return null;

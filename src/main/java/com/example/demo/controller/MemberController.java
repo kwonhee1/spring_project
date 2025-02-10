@@ -40,9 +40,9 @@ public class MemberController {
     }
 
     // Login  : uri : Login, method : get, post
-    @GetMapping("/Login")
+    @GetMapping(URIMappers.LoginPageURI)
     public String loginGet() {
-        return "/MemberController/LoginPage.html";
+        return URIMappers.LoginPageHtml;
     }
 
     // Register : uri : Register, method : get, post,

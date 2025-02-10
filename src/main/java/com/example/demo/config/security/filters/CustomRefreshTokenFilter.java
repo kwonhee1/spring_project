@@ -51,6 +51,8 @@ public class CustomRefreshTokenFilter extends CustomTokenFilter{
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        System.out.println("first filter");
+
         // authentication 없음 (access 없음) => refresh 얻기
         String refresh = (String)request.getAttribute(RefreshToken.REFRESH);
 

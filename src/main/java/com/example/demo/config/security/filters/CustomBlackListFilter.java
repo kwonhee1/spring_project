@@ -42,6 +42,8 @@ public class CustomBlackListFilter extends CustomTokenFilter{
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        System.out.println("blacklist filter");
+
         BlackListService.checkIP((String)request.getAttribute("ip"));
         BlackListService.checkToken((String)request.getAttribute(AccessToken.ACCESS));
 

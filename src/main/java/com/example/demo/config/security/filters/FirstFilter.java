@@ -28,7 +28,7 @@ public class FirstFilter extends AbstractAuthenticationProcessingFilter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         request.setCharacterEncoding("UTF-8");
 
         // reader : login or other json data
@@ -39,6 +39,9 @@ public class FirstFilter extends AbstractAuthenticationProcessingFilter {
         // token
         request.setAttribute(AccessToken.ACCESS, getToken((HttpServletRequest) request, AccessToken.ACCESS));
         request.setAttribute(RefreshToken.REFRESH, getToken((HttpServletRequest) request, RefreshToken.REFRESH));
+
+        System.out.println("first filter");
+        chain.doFilter(request, response);
     }
 
     @Override
